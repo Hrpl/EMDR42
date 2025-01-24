@@ -31,13 +31,13 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<ActionResult<JwtResponse>> Auth(LoginRequest req)
     {
-        var user = await _userService.GetUserAsync(req.Login);
+        var user = await _userService.GetUserAsync(req.Email);
         if (user != null && user.IsConfirmed == false) return BadRequest("Ваш email не подтверждён. Проверьте сообщения на почте.");
 
         var check = await _userService.LoginUserAsync(req);
 
         if (check is false) throw new Exception("Неверный логин или пароль");
-        var id = await _userService.GetUserIdAsync(req.Login);
+        var id = await _userService.GetUserIdAsync(req.Email);
         var jwt = _jwtHelper.CreateJwtAsync(id);
 
         return Ok(jwt);

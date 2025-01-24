@@ -1,9 +1,13 @@
-﻿using EMDR42.Infrastructure.Context;
+﻿using EMDR42.API.Services.Implementation;
+using EMDR42.API.Services.Interfaces;
+using EMDR42.Domain.Commons.Options;
+using EMDR42.Infrastructure.Context;
 using EMDR42.Infrastructure.Services.Implementations;
 using EMDR42.Infrastructure.Services.Interfaces;
 using Mapster;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -36,6 +40,12 @@ public static class AddServiceExtensions
         });
         builder.Services.AddAuthorization();
     }
+
+    public static void AddOptionsSmtp(this WebApplicationBuilder builder)
+    {
+        var services = builder.Services;
+        services.Configure<SmtpClientOptions>(builder.Configuration.GetSection(SmtpClientOptions.Key));
+    }
     public static void AddMapster(this IServiceCollection services)
     {
         TypeAdapterConfig config = TypeAdapterConfig.GlobalSettings;
@@ -49,5 +59,6 @@ public static class AddServiceExtensions
         services.AddScoped<IDbConnectionManager, DbConnectionManager>();
         services.AddScoped<IJwtHelper, JwtHelper>();
         services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IEmailService, EmailService>();
     }
 }

@@ -48,7 +48,8 @@ public class UserService : IUserService
             "Password",
             "IsConfirmed",
             "CreatedAt",
-            "UpdatedAt");
+            "UpdatedAt",
+            "IsDeleted");
 
         var result = _query.FirstOrDefaultAsync<UserModel>(query);
         return result;
@@ -67,7 +68,7 @@ public class UserService : IUserService
     public async Task<bool> LoginUserAsync(LoginRequest request)
     {
         var query = _query.Query(TableName)
-            .Where("Email", request.Login)
+            .Where("Email", request.Email)
             .Where("Password", request.Password)
             .Select("Email");
 
