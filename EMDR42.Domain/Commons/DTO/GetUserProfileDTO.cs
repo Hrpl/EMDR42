@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EMDR42.Domain.Models;
+namespace EMDR42.Domain.Commons.DTO;
 
-public class GetUserProfileModel
+public class GetUserProfileDTO
 {
     public string Name { get; set; }
     public string Surname { get; set; }

@@ -9,6 +9,6 @@ namespace EMDR42.Domain.Entities;
 public class QualificationEntity : BaseEntity
 {
     public int UserId { get; set; }
-    public string School {  get; set; }
-    public string InPractic {  get; set; }
+    public string? School {  get; set; }
+    public string? InPractic {  get; set; }
 }

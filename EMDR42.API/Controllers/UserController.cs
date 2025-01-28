@@ -19,12 +19,23 @@ public class UserController : ControllerBase
     private readonly IUserService _userService;
     private readonly IMapper _mapper;
     private readonly ILogger<UserController> _logger;
-    public UserController(IEmailService emailService, IMapper mapper, IUserService userService, ILogger<UserController> logger)
+    private readonly IUserProfileService _profileService;
+    private readonly IContactService _contactService;
+
+    public UserController(
+        IEmailService emailService, 
+        IMapper mapper, 
+        IUserService userService, 
+        ILogger<UserController> logger,
+        IUserProfileService profileService,
+        IContactService contactService)
     {
         _emailService = emailService;
         _userService = userService;
         _mapper = mapper;
         _logger = logger;
+        _profileService = profileService;
+        _contactService = contactService;
     }
 
     [HttpGet("confirm")]

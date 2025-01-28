@@ -61,5 +61,6 @@ public static class AddServiceExtensions
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IUserProfileService, UserProfileService>();
         services.AddScoped<IEmailService, EmailService>();
+        services.AddScoped<IContactService, ContactService>();
     }
 }

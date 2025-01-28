@@ -1,31 +1,34 @@
 ﻿using EMDR42.Domain.Commons.DTO;
 using EMDR42.Domain.Models;
+using EMDR42.Infrastructure.Services.Implementations;
 using EMDR42.Infrastructure.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Org.BouncyCastle.Asn1.Ocsp;
 using Swashbuckle.AspNetCore.Annotations;
+
+// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace EMDR42.API.Controllers;
 
-[Route("api/userProfile")]
+[Route("api/[controller]")]
 [ApiController]
 [Authorize]
-public class UserProfileController : ControllerBase
+public class ContactsController : ControllerBase
 {
+    private readonly IContactService _contactService;
     private readonly IJwtHelper _jwtHelper;
     private readonly IMapper _mapper;
-    private readonly IUserProfileService _userProfileService;
-    public UserProfileController(IUserProfileService userProfileService, IJwtHelper jwtHelper, IMapper mapper)
+    public ContactsController(IContactService contactService, IJwtHelper jwtHelper, IMapper mapper)
     {
-        _userProfileService = userProfileService;
+        _contactService = contactService;
         _jwtHelper = jwtHelper;
         _mapper = mapper;
     }
 
     [HttpGet]
-    [SwaggerOperation(Summary = "Получение основной информации пользователя. Необходим JWT")]
-    public async Task<ActionResult<GetUserProfileDTO>> Get()
+    [SwaggerOperation(Summary = "Получение контактов пользователя. Необходим JWT")]
+    public async Task<ActionResult<ContactsDTO>> Get()
     {
         try
         {
@@ -36,9 +39,9 @@ public class UserProfileController : ControllerBase
                 var token = authorizationHeader.Substring("Bearer ".Length).Trim();
                 var id = await _jwtHelper.DecodJwt(token);
 
-                var response = await _userProfileService.GetUserProfilesAsync(id);
+                var response = await _contactService.GetUserContactsAsync(id);
 
-                if(response != null) return Ok();
+                if (response != null) return Ok();
                 else return BadRequest();
             }
             else return Unauthorized();
@@ -50,8 +53,8 @@ public class UserProfileController : ControllerBase
     }
 
     [HttpPut]
-    [SwaggerOperation(Summary = "Обновление основной информации пользователя. Необходим JWT")]
-    public async Task<ActionResult> Put([FromBody] GetUserProfileDTO request)
+    [SwaggerOperation(Summary = "Обновление контактов пользователя. Необходим JWT")]
+    public async Task<ActionResult> Put(ContactsDTO request)
     {
         try
         {
@@ -62,10 +65,10 @@ public class UserProfileController : ControllerBase
                 var token = authorizationHeader.Substring("Bearer ".Length).Trim();
                 var id = await _jwtHelper.DecodJwt(token);
 
-                var model = _mapper.Map<UserProfileModel>(request);
+                var model = _mapper.Map<ContactsModel>(request);
                 model.UserId = id;
 
-                await _userProfileService.UpdateUserProfileAsync( model);
+                await _contactService.UpdateUserContactsAsync(model);
                 return Ok();
             }
             else return Unauthorized();

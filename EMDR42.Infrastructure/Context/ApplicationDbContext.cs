@@ -12,7 +12,6 @@ public class ApplicationDbContext : DbContext
 {
     public DbSet<UserEntity> Users { get; set; }
     public DbSet<UserProfileEntity> UserProfile { get; set; }
-    public DbSet<RoleEntity> Roles { get; set; }
     public DbSet<QualificationEntity> Qualifications { get; set; }
     public DbSet<ContactEntity> Contacts { get; set; }
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)

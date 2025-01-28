@@ -9,7 +9,7 @@ namespace EMDR42.Domain.Entities;
 public class ContactEntity : BaseEntity
 {
     public int UserId { get; set; }
-    public string PhoneNumber { get; set; }
-    public string ContactEmail { get; set; }
-    public string ContactWebSite { get; set; }
+    public string? PhoneNumber { get; set; }
+    public string? ContactEmail { get; set; }
+    public string? ContactWebSite { get; set; }
 }

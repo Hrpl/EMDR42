@@ -8,18 +8,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace EMDR42.Infrastructure.Services.Implementations;
 
-public class UserProfileService : IUserProfileService
+public class ContactService : IContactService
 {
     private readonly QueryFactory _query;
-    private const string TableName = "UserProfile";
-    public UserProfileService(IDbConnectionManager connectionManager)
+    private const string TableName = "Contacts";
+    public ContactService(IDbConnectionManager dbConnectionManager)
     {
-        _query = connectionManager.PostgresQueryFactory;
+        _query = dbConnectionManager.PostgresQueryFactory;
     }
-    public async Task CreateUserProfileAsync(UserProfileModel model)
+    public async Task CreateUserContactsAsync(ContactsModel model)
     {
         var query = _query.Query(TableName)
             .AsInsert(model);
@@ -27,24 +28,20 @@ public class UserProfileService : IUserProfileService
         await _query.ExecuteAsync(query);
     }
 
-    public async Task<GetUserProfileDTO> GetUserProfilesAsync(int id)
+    public async Task<ContactsDTO> GetUserContactsAsync(int id)
     {
         var query = _query.Query(TableName)
             .Where("UserId", id)
-            .Select("Name",
-            "Surname",
-            "Patronymic",
-            "Gender",
-            "Birthday",
-            "Address",
-            "IsPublic");
+            .Select("PhoneNumber",
+            "ContactEmail",
+            "ContactWebSite");
 
-        var result = await _query.FirstOrDefaultAsync<GetUserProfileDTO>(query);
+        var result = await _query.FirstOrDefaultAsync<ContactsDTO>(query);
 
         return result;
     }
 
-    public async Task UpdateUserProfileAsync(UserProfileModel model)
+    public async Task UpdateUserContactsAsync(ContactsModel model)
     {
         var query = _query.Query(TableName).Where("UserId", model.UserId).AsUpdate(model);
 
