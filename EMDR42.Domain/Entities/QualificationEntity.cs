@@ -10,5 +10,6 @@ public class QualificationEntity : BaseEntity
 {
     public int UserId { get; set; }
     public string? School {  get; set; }
+    public string? Supervisor { get; set; }
     public string? InPractic {  get; set; }
 }
