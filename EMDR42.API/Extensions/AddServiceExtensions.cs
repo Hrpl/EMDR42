@@ -59,6 +59,7 @@ public static class AddServiceExtensions
         services.AddScoped<IDbConnectionManager, DbConnectionManager>();
         services.AddScoped<IJwtHelper, JwtHelper>();
         services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IUserProfileService, UserProfileService>();
         services.AddScoped<IEmailService, EmailService>();
     }
 }

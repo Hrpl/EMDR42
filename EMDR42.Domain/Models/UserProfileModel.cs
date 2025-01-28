@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace EMDR42.Domain.Models;
 
-namespace EMDR42.Domain.Entities;
-
-public class UserProfileEntity : BaseEntity
+public class UserProfileModel
 {
     public int UserId { get; set; }
     public string Name { get; set; }
@@ -16,4 +10,7 @@ public class UserProfileEntity : BaseEntity
     public DateOnly Birthday { get; set; }
     public string Address { get; set; }
     public bool IsPublic { get; set; }
+    public DateTime? CreatedAt { get; set; } = DateTime.Now;
+    public DateTime? UpdatedAt { get; set; } = DateTime.Now;
+    public bool IsDeleted { get; set; } = false;
 }
