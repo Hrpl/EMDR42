@@ -3,6 +3,7 @@ using EMDR42.Domain.Models;
 using EMDR42.Infrastructure.Services.Interfaces;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Npgsql;
 using SqlKata.Execution;
 using System;
 using System.Collections.Generic;
@@ -22,12 +23,12 @@ public class QualificationService : IQualificationService
         _query = dbConnection.PostgresQueryFactory;
     }
 
-    public async Task CreateUserQualificationAsync(QualificationModel model)
+    public async Task CreateUserQualificationAsync(QualificationModel model, NpgsqlTransaction transaction, QueryFactory query)
     {
-        var query = _query.Query(TableName)
+        var q = query.Query(TableName)
             .AsInsert(model);
 
-        await _query.ExecuteAsync(query);
+        await _query.ExecuteAsync(q, transaction);
     }
 
     public async Task<QualificationDTO> GetUserQualificationAsync(int id)
@@ -46,6 +47,13 @@ public class QualificationService : IQualificationService
     public async Task UpdateUserQualificationAsync(QualificationModel model)
     {
         var query = _query.Query(TableName).Where("UserId", model.UserId).AsUpdate(model);
+
+        await _query.ExecuteAsync(query);
+    }
+
+    public async Task DeleteUserQualificationAsync(int id)
+    {
+        var query = _query.Query(TableName).Where("UserId", id).AsDelete();
 
         await _query.ExecuteAsync(query);
     }

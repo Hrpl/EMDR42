@@ -1,6 +1,7 @@
 ﻿using EMDR42.Domain.Commons.DTO;
 using EMDR42.Domain.Models;
 using EMDR42.Infrastructure.Services.Interfaces;
+using Npgsql;
 using SqlKata;
 using SqlKata.Execution;
 using System;
@@ -19,12 +20,12 @@ public class UserProfileService : IUserProfileService
     {
         _query = connectionManager.PostgresQueryFactory;
     }
-    public async Task CreateUserProfileAsync(UserProfileModel model)
+    public async Task CreateUserProfileAsync(UserProfileModel model, NpgsqlTransaction transaction, QueryFactory query)
     {
-        var query = _query.Query(TableName)
+        var q = query.Query(TableName)
             .AsInsert(model);
 
-        await _query.ExecuteAsync(query);
+        await _query.ExecuteAsync(q, transaction);
     }
 
     public async Task<GetUserProfileDTO> GetUserProfilesAsync(int id)
@@ -47,6 +48,13 @@ public class UserProfileService : IUserProfileService
     public async Task UpdateUserProfileAsync(UserProfileModel model)
     {
         var query = _query.Query(TableName).Where("UserId", model.UserId).AsUpdate(model);
+
+        await _query.ExecuteAsync(query);
+    }
+
+    public async Task DeleteUserProfileAsync(int id)
+    {
+        var query = _query.Query(TableName).Where("UserId", id).AsDelete();
 
         await _query.ExecuteAsync(query);
     }

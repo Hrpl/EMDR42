@@ -1,4 +1,5 @@
-﻿using SqlKata.Execution;
+﻿using Npgsql;
+using SqlKata.Execution;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,4 +11,5 @@ namespace EMDR42.Infrastructure.Services.Interfaces;
 public interface IDbConnectionManager
 {
     public QueryFactory PostgresQueryFactory { get; }
+    public NpgsqlConnection PostgresDbConnection { get; }
 }

@@ -24,7 +24,7 @@ public class DbConnectionManager : IDbConnectionManager
         _logger = logger;
     }
 
-    private NpgsqlConnection PostgresDbConnection => new(NpgsqlConnectionString);
+    public NpgsqlConnection PostgresDbConnection => new(NpgsqlConnectionString);
 
     public QueryFactory PostgresQueryFactory => new(PostgresDbConnection, new PostgresCompiler(), 60)
     {

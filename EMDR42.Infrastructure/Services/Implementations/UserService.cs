@@ -1,6 +1,7 @@
 ﻿using EMDR42.Domain.Commons.Request;
 using EMDR42.Domain.Models;
 using EMDR42.Infrastructure.Services.Interfaces;
+using Npgsql;
 using SqlKata.Execution;
 
 namespace EMDR42.Infrastructure.Services.Implementations;
@@ -26,11 +27,11 @@ public class UserService : IUserService
         else return false;
     }
 
-    public async Task CreatedUserAsync(UserModel model)
+    public async Task CreatedUserAsync(UserModel model, NpgsqlTransaction transaction, QueryFactory query)
     {
-        var query = _query.Query(TableName).AsInsert(model);
+        var q = query.Query(TableName).AsInsert(model);
 
-        await _query.ExecuteAsync(query);
+        await _query.ExecuteAsync(q, transaction);
     }
 
     public async Task DeleteUserAsync(string login)

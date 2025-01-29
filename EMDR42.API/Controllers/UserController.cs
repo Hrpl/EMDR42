@@ -6,6 +6,8 @@ using EMDR42.Domain.Models;
 using EMDR42.Infrastructure.Services.Interfaces;
 using MapsterMapper;
 using Microsoft.AspNetCore.Mvc;
+using SqlKata.Compilers;
+using SqlKata.Execution;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -21,14 +23,18 @@ public class UserController : ControllerBase
     private readonly ILogger<UserController> _logger;
     private readonly IUserProfileService _profileService;
     private readonly IContactService _contactService;
+    private readonly IQualificationService _qualificationService;
+    private readonly IDbConnectionManager _dbConnectionManager;
 
     public UserController(
-        IEmailService emailService, 
-        IMapper mapper, 
-        IUserService userService, 
+        IEmailService emailService,
+        IMapper mapper,
+        IUserService userService,
         ILogger<UserController> logger,
         IUserProfileService profileService,
-        IContactService contactService)
+        IContactService contactService,
+        IQualificationService qualificationService,
+        IDbConnectionManager dbConnectionManager)
     {
         _emailService = emailService;
         _userService = userService;
@@ -36,6 +42,8 @@ public class UserController : ControllerBase
         _logger = logger;
         _profileService = profileService;
         _contactService = contactService;
+        _qualificationService = qualificationService;
+        _dbConnectionManager = dbConnectionManager;
     }
 
     [HttpGet("confirm")]
@@ -70,38 +78,51 @@ public class UserController : ControllerBase
     [HttpPost("create")]
     public async Task<ActionResult> Create([FromBody] LoginRequest req)
     {
-        if (req.Email == "") throw new Exception("Поле Email не заполнено");
+        if (req.Email == "") return BadRequest("Поле Email не заполнено");
         _logger.LogError("Поле Email не заполнено");
 
         var findEmail = await _userService.CheckedUserByLoginAsync(req.Email);
 
-        if (findEmail is true) throw new Exception("Пользователь с таким email уже существует");
+        if (findEmail) return BadRequest("Пользователь с таким email уже существует");
         _logger.LogError("Пользователь с таким email уже существует");
 
         var user = _mapper.Map<UserModel>(req);
-
-        try
+        using(var connection = _dbConnectionManager.PostgresDbConnection)
         {
-            await _userService.CreatedUserAsync(user);
-            try
-            {
-                var person = new SendEmailDto() { Email = req.Email, Name = "", Subject = "Confirm email", MessageBody = EmailTemplates.RegistrationEmailTemplate.Replace("@email", req.Email) };
-                _logger.LogInformation("Начало отправки сообщения пользователю");
-                await _emailService.SendEmail(person);
-            }
-            catch (Exception ex)
-            {
-                await _userService.DeleteUserAsync(req.Email);
-                _logger.LogError("Ошибка отправки сообщения пользователю");
-                return BadRequest("Ошибка отправки сообщения пользователю." + ex);
-            }
-            return Ok(req.Email);
-        }
-        catch (Exception)
-        {
-            _logger.LogError("Ошибка при создании пользователя");
-            return BadRequest("Ошибка при создании пользователя");
-        }
+            await connection.OpenAsync();
 
+            using(var transaction = connection.BeginTransaction())
+            {
+                try
+                {
+                    var queryFactory = new QueryFactory(connection, new PostgresCompiler())
+                    {
+                        Logger = compiled => Console.WriteLine(compiled.ToString())
+                    };
+
+                    await _userService.CreatedUserAsync(user, transaction, queryFactory);
+                    var id = await _userService.GetUserIdAsync(user.Email);
+
+                    await _profileService.CreateUserProfileAsync(new UserProfileModel { UserId = id }, transaction, queryFactory);
+                    await _contactService.CreateUserContactsAsync(new ContactsModel { UserId = id, ContactEmail = user.Email }, transaction, queryFactory);
+                    await _qualificationService.CreateUserQualificationAsync(new QualificationModel { UserId = id }, transaction, queryFactory);
+
+                    await transaction.CommitAsync();
+
+                    var person = new SendEmailDto() { Email = req.Email, Name = "", Subject = "Confirm email", MessageBody = EmailTemplates.RegistrationEmailTemplate.Replace("@email", req.Email) };
+                    _logger.LogInformation("Начало отправки сообщения пользователю");
+                    await _emailService.SendEmail(person);
+
+                    _logger.LogInformation("Сообщение отправлено пользователю");
+                    return Ok(req.Email);
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    _logger.LogError("Ошибка при создании пользователя");
+                    return BadRequest("Ошибка при создании пользователя: " + ex);
+                }
+            }
+        }
     }
 }

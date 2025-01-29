@@ -1,6 +1,7 @@
 ﻿using EMDR42.Domain.Commons.DTO;
 using EMDR42.Domain.Models;
 using EMDR42.Infrastructure.Services.Interfaces;
+using Npgsql;
 using SqlKata;
 using SqlKata.Execution;
 using System;
@@ -20,12 +21,12 @@ public class ContactService : IContactService
     {
         _query = dbConnectionManager.PostgresQueryFactory;
     }
-    public async Task CreateUserContactsAsync(ContactsModel model)
+    public async Task CreateUserContactsAsync(ContactsModel model, NpgsqlTransaction transaction, QueryFactory query)
     {
-        var query = _query.Query(TableName)
+        var q = query.Query(TableName)
             .AsInsert(model);
 
-        await _query.ExecuteAsync(query);
+        await _query.ExecuteAsync(q, transaction);
     }
 
     public async Task<ContactsDTO> GetUserContactsAsync(int id)
@@ -44,6 +45,13 @@ public class ContactService : IContactService
     public async Task UpdateUserContactsAsync(ContactsModel model)
     {
         var query = _query.Query(TableName).Where("UserId", model.UserId).AsUpdate(model);
+
+        await _query.ExecuteAsync(query);
+    }
+
+    public async Task DeleteUserContactsAsync(int id)
+    {
+        var query = _query.Query(TableName).Where("UserId", id).AsDelete();
 
         await _query.ExecuteAsync(query);
     }
