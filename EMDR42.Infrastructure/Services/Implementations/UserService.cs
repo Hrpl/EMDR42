@@ -9,10 +9,13 @@ namespace EMDR42.Infrastructure.Services.Implementations;
 public class UserService : IUserService
 {
     private readonly QueryFactory _query;
+    private readonly ICryptographyService _cryptographyService;
     private readonly string TableName = "Users";
-    public UserService(IDbConnectionManager connectionManager)
+
+    public UserService(IDbConnectionManager connectionManager, ICryptographyService cryptographyService)
     {
         _query = connectionManager.PostgresQueryFactory;
+        _cryptographyService = cryptographyService;
     }
 
     public async Task<bool> CheckedUserByLoginAsync(string login)
@@ -29,6 +32,11 @@ public class UserService : IUserService
 
     public async Task CreatedUserAsync(UserModel model, NpgsqlTransaction transaction, QueryFactory query)
     {
+        string salt = _cryptographyService.GenerateSalt();
+        string hashedPassword = _cryptographyService.HashPassword(model.Password, salt);
+        model.Password = hashedPassword;
+        model.Salt = salt;
+
         var q = query.Query(TableName).AsInsert(model);
 
         await _query.ExecuteAsync(q, transaction);
@@ -47,6 +55,7 @@ public class UserService : IUserService
             .Where("Email", login)
             .Select("Email",
             "Password",
+            "Salt",
             "IsConfirmed",
             "CreatedAt",
             "UpdatedAt",
@@ -68,14 +77,18 @@ public class UserService : IUserService
 
     public async Task<bool> LoginUserAsync(LoginRequest request)
     {
+        //todo: salt
         var query = _query.Query(TableName)
             .Where("Email", request.Email)
-            .Where("Password", request.Password)
-            .Select("Email");
+            .Select("Password",
+            "Salt");
 
-        var result = await _query.FirstOrDefaultAsync<string>(query);
+        if(query == null) return false;
+        var result = await _query.FirstOrDefaultAsync<CheckPasswordModel>(query);
 
-        if (result != null) return true;
+        string hash = _cryptographyService.HashPassword(request.Password, result.Salt);
+
+        if (hash == result.Password) return true;
         else return false;
     }
 

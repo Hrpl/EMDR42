@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Reflection;
 using System.Text;
@@ -22,6 +23,36 @@ public static class AddServiceExtensions
     {
         services.AddMapster();
         services.AddRegisterService();
+        services.AddOpenAPI();
+    }
+    public static void AddOpenAPI(this IServiceCollection services)
+    {
+        services.AddSwaggerGen(c =>
+            {
+            c.EnableAnnotations();
+            c.SwaggerDoc("v1", new OpenApiInfo { Title = "Repositories", Version = "v2024" });
+            c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                Description = "Authorization using jwt token. Example: \"Bearer {token}\"",
+                Name = "Authorization",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.ApiKey
+            });
+            c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] { }
+        }
+    });
+        });
     }
     public static void AddJwt(this WebApplicationBuilder builder)
     {
@@ -30,7 +61,7 @@ public static class AddServiceExtensions
         {
             options.TokenValidationParameters = new TokenValidationParameters
             {
-                ValidateIssuer = true,
+                ValidateIssuer = false,
                 ValidIssuer = builder.Configuration["JwtConfigurations:Issuer"],
                 ValidateAudience = false,
                 ValidateLifetime = true,
@@ -63,5 +94,7 @@ public static class AddServiceExtensions
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<IContactService, ContactService>();
         services.AddScoped<IQualificationService, QualificationService>();
+        services.AddScoped<ICryptographyService, CryptographyService>();
+        services.AddScoped<IClientService, ClientService>();
     }
 }

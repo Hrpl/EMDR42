@@ -4,12 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EMDR42.Domain.Entities;
+namespace EMDR42.Domain.Models;
 
-public class UserEntity : BaseEntity
+public class CheckPasswordModel
 {
-    public string Email { get; set; }
     public string Password { get; set; }
     public string Salt { get; set; }
-    public bool IsConfirmed { get; set; }
 }
