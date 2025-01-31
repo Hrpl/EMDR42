@@ -20,4 +20,11 @@ public class ApplicationDbContext : DbContext
     {
         Database.Migrate();
     }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.UseSnakeCaseNamingConvention();
+        base.OnConfiguring(optionsBuilder);
+    }
+
 }

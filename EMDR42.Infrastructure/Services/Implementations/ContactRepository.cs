@@ -16,7 +16,7 @@ namespace EMDR42.Infrastructure.Services.Implementations;
 public class ContactRepository : IContactRepository
 {
     private readonly QueryFactory _query;
-    private const string TableName = "Contacts";
+    private const string TableName = "contacts";
     public ContactRepository(IDbConnectionManager dbConnectionManager)
     {
         _query = dbConnectionManager.PostgresQueryFactory;
@@ -32,10 +32,10 @@ public class ContactRepository : IContactRepository
     public async Task<ContactsDTO> GetUserContactsAsync(int id)
     {
         var query = _query.Query(TableName)
-            .Where("UserId", id)
-            .Select("PhoneNumber",
-            "ContactEmail",
-            "ContactWebSite");
+            .Where("user_id", id)
+            .Select("phone_number",
+            "contact_email",
+            "contact_web_site");
 
         var result = await _query.FirstOrDefaultAsync<ContactsDTO>(query);
 
@@ -44,14 +44,14 @@ public class ContactRepository : IContactRepository
 
     public async Task<int> UpdateUserContactsAsync(ContactsModel model)
     {
-        var query = _query.Query(TableName).Where("UserId", model.UserId).AsUpdate(model);
+        var query = _query.Query(TableName).Where("user_id", model.UserId).AsUpdate(model);
 
         return await _query.ExecuteAsync(query);
     }
 
     public async Task DeleteUserContactsAsync(int id)
     {
-        var query = _query.Query(TableName).Where("UserId", id).AsDelete();
+        var query = _query.Query(TableName).Where("user_id", id).AsDelete();
 
         await _query.ExecuteAsync(query);
     }

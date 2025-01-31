@@ -15,7 +15,7 @@ namespace EMDR42.Infrastructure.Services.Implementations;
 public class UserProfileRepository : IUserProfileRepository
 {
     private readonly QueryFactory _query;
-    private const string TableName = "UserProfile";
+    private const string TableName = "user_profile";
     public UserProfileRepository(IDbConnectionManager connectionManager)
     {
         _query = connectionManager.PostgresQueryFactory;
@@ -31,14 +31,14 @@ public class UserProfileRepository : IUserProfileRepository
     public async Task<GetUserProfileDTO> GetUserProfilesAsync(int id)
     {
         var query = _query.Query(TableName)
-            .Where("UserId", id)
-            .Select("Name",
-            "Surname",
-            "Patronymic",
-            "Gender",
-            "Birthday",
-            "Address",
-            "IsPublic");
+            .Where("user_id", id)
+            .Select("name",
+            "surname",
+            "patronymic",
+            "gender",
+            "birthday",
+            "address",
+            "is_public");
 
         var result = await _query.FirstOrDefaultAsync<GetUserProfileDTO>(query);
 
@@ -47,14 +47,14 @@ public class UserProfileRepository : IUserProfileRepository
 
     public async Task<int> UpdateUserProfileAsync(UserProfileModel model)
     {
-        var query = _query.Query(TableName).Where("UserId", model.UserId).AsUpdate(model);
+        var query = _query.Query(TableName).Where("user_id", model.UserId).AsUpdate(model);
 
         return await _query.ExecuteAsync(query);
     }
 
     public async Task DeleteUserProfileAsync(int id)
     {
-        var query = _query.Query(TableName).Where("UserId", id).AsDelete();
+        var query = _query.Query(TableName).Where("user_id", id).AsDelete();
 
         await _query.ExecuteAsync(query);
     }

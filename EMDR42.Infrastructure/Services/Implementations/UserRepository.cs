@@ -10,7 +10,7 @@ public class UserRepository : IUserRepository
 {
     private readonly QueryFactory _query;
     private readonly ICryptographyService _cryptographyService;
-    private readonly string TableName = "Users";
+    private readonly string TableName = "users";
 
     public UserRepository(IDbConnectionManager connectionManager, ICryptographyService cryptographyService)
     {
@@ -21,8 +21,8 @@ public class UserRepository : IUserRepository
     public async Task<bool> CheckedUserByLoginAsync(string login)
     {
         var query = _query.Query(TableName)
-            .Where("Email", login)
-            .Select("Email");
+            .Where("email", login)
+            .Select("email");
 
         var result = await _query.FirstOrDefaultAsync<string>(query);
 
@@ -44,7 +44,7 @@ public class UserRepository : IUserRepository
 
     public async Task DeleteUserAsync(string login)
     {
-        var query = _query.Query(TableName).Where("Email", login).AsDelete();
+        var query = _query.Query(TableName).Where("email", login).AsDelete();
 
         await _query.ExecuteAsync(query);
     }
@@ -52,14 +52,14 @@ public class UserRepository : IUserRepository
     public Task<UserModel> GetUserAsync(string login)
     {
         var query = _query.Query(TableName)
-            .Where("Email", login)
-            .Select("Email",
-            "Password",
-            "Salt",
-            "IsConfirmed",
-            "CreatedAt",
-            "UpdatedAt",
-            "IsDeleted");
+            .Where("email", login)
+            .Select("email",
+            "password",
+            "salt",
+            "is_confirmed",
+            "created_at",
+            "updated_at",
+            "is_deleted");
 
         var result = _query.FirstOrDefaultAsync<UserModel>(query);
         return result;
@@ -68,8 +68,8 @@ public class UserRepository : IUserRepository
     public async Task<int> GetUserIdAsync(string login)
     {
         var query = _query.Query(TableName)
-            .Where("Email", login)
-            .Select("Id");
+            .Where("email", login)
+            .Select("id");
 
         var result = await _query.FirstAsync<int>(query);
         return result;
@@ -78,9 +78,9 @@ public class UserRepository : IUserRepository
     public async Task<bool> LoginUserAsync(LoginRequest request)
     {
         var query = _query.Query(TableName)
-            .Where("Email", request.Email)
-            .Select("Password",
-            "Salt");
+            .Where("email", request.Email)
+            .Select("password",
+            "salt");
 
         if(query == null) return false;
         var result = await _query.FirstOrDefaultAsync<CheckPasswordModel>(query);
@@ -93,7 +93,7 @@ public class UserRepository : IUserRepository
 
     public async Task<int> UserConfirmAsync(string login)
     {
-        var query = _query.Query(TableName).Where("Email", login).AsUpdate(new
+        var query = _query.Query(TableName).Where("email", login).AsUpdate(new
         {
             IsConfirmed = true
         });

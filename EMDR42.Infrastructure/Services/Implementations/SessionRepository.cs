@@ -10,7 +10,7 @@ public class SessionRepository : ISessionRepository
 {
     private readonly QueryFactory _query;
     private readonly ILogger<SessionRepository> _logger;
-    private const string TableName = "Sessions";
+    private const string TableName = "sessions";
     public SessionRepository(IDbConnectionManager dbConnection, ILogger<SessionRepository> logger)
     {
         _query = dbConnection.PostgresQueryFactory ?? throw new ArgumentNullException(nameof(dbConnection));
@@ -39,11 +39,11 @@ public class SessionRepository : ISessionRepository
         try
         {
             var query = _query.Query(TableName)
-                .Where("CreatedAt", ">", request.Start)
-                .Where("CreatedAt", "<", request.End)
-                .Where("ClientId", request.ClientId)
-                .Select("CreatedAt",
-                "Duration");
+                .Where("created_at", ">", request.Start)
+                .Where("created_at", "<", request.End)
+                .Where("client_id", request.ClientId)
+                .Select("created_at",
+                "duration");
 
             var result = await _query.GetAsync<SessionLogResponse>(query);
             return result;

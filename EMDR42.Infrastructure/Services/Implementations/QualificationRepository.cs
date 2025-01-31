@@ -17,7 +17,7 @@ namespace EMDR42.Infrastructure.Services.Implementations;
 public class QualificationRepository : IQualificationRepository
 {
     private readonly QueryFactory _query;
-    private const string TableName = "Qualifications";
+    private const string TableName = "qualifications";
     public QualificationRepository(IDbConnectionManager dbConnection)
     {
         _query = dbConnection.PostgresQueryFactory;
@@ -34,10 +34,10 @@ public class QualificationRepository : IQualificationRepository
     public async Task<QualificationDTO> GetUserQualificationAsync(int id)
     {
         var query = _query.Query(TableName)
-            .Where("UserId", id)
-            .Select("School",
-            "Supervisor",
-            "InPractic");
+            .Where("user_id", id)
+            .Select("school",
+            "supervisor",
+            "in_practic");
 
         var result = await _query.FirstOrDefaultAsync<QualificationDTO>(query);
 
@@ -46,14 +46,14 @@ public class QualificationRepository : IQualificationRepository
 
     public async Task<int> UpdateUserQualificationAsync(QualificationModel model)
     {
-        var query = _query.Query(TableName).Where("UserId", model.UserId).AsUpdate(model);
+        var query = _query.Query(TableName).Where("user_id", model.UserId).AsUpdate(model);
 
         return await _query.ExecuteAsync(query);
     }
 
     public async Task DeleteUserQualificationAsync(int id)
     {
-        var query = _query.Query(TableName).Where("UserId", id).AsDelete();
+        var query = _query.Query(TableName).Where("user_id", id).AsDelete();
 
         await _query.ExecuteAsync(query);
     }

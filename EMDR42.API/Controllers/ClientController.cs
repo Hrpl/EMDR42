@@ -48,8 +48,8 @@ public class ClientController : ControllerBase
             }
 
 
-            //todo: вывод клиентов и данных о его сессиях
-            return Ok();
+            var response = await _clientService.GetAllClientAsync(request, Convert.ToInt32(userId));
+            return Ok(response);
         }
         catch (Exception ex)
         {
