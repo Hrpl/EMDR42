@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EMDR42.Domain.Entities;
+namespace EMDR42.Domain.Commons.DTO;
 
-public class SessionEntity : BaseEntity
+public class GetSessionLogs
 {
-    public int UserId { get; set; }
     public int ClientId { get; set; }
-    public string Duration { get; set; }
+    public DateTime Start {  get; set; }
+    public DateTime End { get; set; }
 }

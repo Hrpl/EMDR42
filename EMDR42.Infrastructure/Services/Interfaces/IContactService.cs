@@ -14,6 +14,6 @@ public interface IContactService
 {
     public Task<ContactsDTO> GetUserContactsAsync(int id);
     public Task CreateUserContactsAsync(ContactsModel model, NpgsqlTransaction transaction, QueryFactory query);
-    public Task UpdateUserContactsAsync(ContactsModel model);
+    public Task<int> UpdateUserContactsAsync(ContactsModel model);
     public Task DeleteUserContactsAsync(int id);
 }

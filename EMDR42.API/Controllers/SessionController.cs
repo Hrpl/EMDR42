@@ -1,38 +1,38 @@
 ﻿using EMDR42.Domain.Commons.DTO;
 using EMDR42.Domain.Models;
-using EMDR42.Infrastructure.Services.Implementations;
 using EMDR42.Infrastructure.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Org.BouncyCastle.Asn1.Ocsp;
 using Swashbuckle.AspNetCore.Annotations;
+using System.Data.Common;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace EMDR42.API.Controllers;
 
-[Route("api/contacts")]
+[Route("api/session")]
 [ApiController]
 [Authorize]
-public class ContactsController : ControllerBase
+public class SessionController : ControllerBase
 {
-    private readonly IContactService _contactService;
     private readonly IMapper _mapper;
-    private readonly ILogger<ContactsController> _logger;
-    public ContactsController(IContactService contactService, IMapper mapper, ILogger<ContactsController> logger)
+    private readonly ISessionService _sessionService;
+    private readonly ILogger<SessionController> _logger;
+    public SessionController( ISessionService sessionService, IMapper mapper, ILogger<SessionController> logger)
     {
-        _contactService = contactService ?? throw new ArgumentNullException(nameof(contactService));
         _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+        _sessionService = sessionService ?? throw new ArgumentNullException(nameof(sessionService));
         _logger = logger;
     }
 
     /// <summary>
-    /// Получение контактов пользователя. Необходим JWT
+    /// Получение логов сессии
     /// </summary>
+    /// <param name="request"></param>
     /// <returns></returns>
-    [HttpGet]
-    [SwaggerOperation(Summary = "Получение контактов пользователя. Необходим JWT")]
-    public async Task<ActionResult<ContactsDTO>> Get()
+    [HttpPost("log")]
+    [SwaggerOperation(Summary = "Получение логов сессии. Необходим JWT")]
+    public async Task<ActionResult<IEnumerable<SessionLogResponse>>> Get([FromBody] GetSessionLogs request)
     {
         try
         {
@@ -47,19 +47,19 @@ public class ContactsController : ControllerBase
                 });
             }
 
-            var response = await _contactService.GetUserContactsAsync(Convert.ToInt32(userId));
+            var result = await _sessionService.GetSessionLogs(request, Convert.ToInt32( userId));
 
-            if (response == null)
+            if (result == null)
             {
-                _logger.LogError("При запросе данных произошла ошибка");
-                return BadRequest(new ProblemDetails
+                _logger.LogError("Ошибка при получении истории сессии");
+                return StatusCode(500, new ProblemDetails
                 {
-                    Title = "BadRequest",
-                    Detail = "При запросе данных произошла ошибка"
+                    Title = "Internal server error",
+                    Detail = $"Ошибка при получении истории сессии"
                 });
             }
-            return Ok(response);
 
+            return Ok(result);
         }
         catch (Exception ex)
         {
@@ -73,13 +73,13 @@ public class ContactsController : ControllerBase
     }
 
     /// <summary>
-    /// Обновление контактов пользователя. Необходим JWT
+    /// Создание записи о сессии. Необходим JWT
     /// </summary>
     /// <param name="request"></param>
     /// <returns></returns>
-    [HttpPut]
-    [SwaggerOperation(Summary = "Обновление контактов пользователя. Необходим JWT")]
-    public async Task<ActionResult> Put(ContactsDTO request)
+    [HttpPost]
+    [SwaggerOperation(Summary = "Создание записи о сессии. Необходим JWT")]
+    public async Task<ActionResult> Post([FromBody] SessionDTO request)
     {
         try
         {
@@ -94,21 +94,22 @@ public class ContactsController : ControllerBase
                 });
             }
 
-            var model = _mapper.Map<ContactsModel>(request);
+            var model = _mapper.Map<SessionModel>(request);
             model.UserId = Convert.ToInt32( userId);
 
-            var result = await _contactService.UpdateUserContactsAsync(model);
+            var result = await _sessionService.CreateSessionAsync(model);
+
             if (result != 1)
             {
-                _logger.LogError($"Произошла ошибка при обновлении контактов пользователя");
-                return NotFound(new ProblemDetails
+                _logger.LogError("Ошибка при создании записи о сессии");
+                return StatusCode(500, new ProblemDetails
                 {
-                    Title = "NotFound",
-                    Detail = "Произошла ошибка при обновлении контактов пользователя"
+                    Title = "Internal server error",
+                    Detail = $"Ошибка при создании записи о сессии"
                 });
             }
 
-            return NoContent();
+            return Created();
         }
         catch (Exception ex)
         {

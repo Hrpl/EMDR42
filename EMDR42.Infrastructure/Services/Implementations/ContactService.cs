@@ -42,11 +42,11 @@ public class ContactService : IContactService
         return result;
     }
 
-    public async Task UpdateUserContactsAsync(ContactsModel model)
+    public async Task<int> UpdateUserContactsAsync(ContactsModel model)
     {
         var query = _query.Query(TableName).Where("UserId", model.UserId).AsUpdate(model);
 
-        await _query.ExecuteAsync(query);
+        return await _query.ExecuteAsync(query);
     }
 
     public async Task DeleteUserContactsAsync(int id)

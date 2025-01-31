@@ -96,5 +96,6 @@ public static class AddServiceExtensions
         services.AddScoped<IQualificationService, QualificationService>();
         services.AddScoped<ICryptographyService, CryptographyService>();
         services.AddScoped<IClientService, ClientService>();
+        services.AddScoped<ISessionService, SessionService>();
     }
 }
