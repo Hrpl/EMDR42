@@ -40,7 +40,7 @@ public class UserController : ControllerBase
         _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
         _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
-        _logger = logger ;
+        _logger = logger;
         _profileService = profileService ?? throw new ArgumentNullException(nameof(profileService));
         _contactService = contactService ?? throw new ArgumentNullException(nameof(contactService));
         _qualificationService = qualificationService ?? throw new ArgumentNullException(nameof(qualificationService));
@@ -114,11 +114,11 @@ public class UserController : ControllerBase
                 Title = "BadRequest",
                 Detail = "Поле Email не заполнено"
             });
-        } 
+        }
 
         var findEmail = await _userService.CheckedUserByLoginAsync(req.Email);
 
-        if (findEmail) 
+        if (findEmail)
         {
             _logger.LogError("Пользователь с таким email уже существует");
             return BadRequest(new ProblemDetails
@@ -126,50 +126,43 @@ public class UserController : ControllerBase
                 Title = "BadRequest",
                 Detail = "Пользователь с таким email уже существует"
             });
-        } 
+        }
 
         var user = _mapper.Map<UserModel>(req);
         //todo:
-        using (var connection = _dbConnectionManager.PostgresDbConnection)
+
+        try
         {
-            await connection.OpenAsync();
 
-            using(var transaction = connection.BeginTransaction())
+            var resUser = await _userService.CreatedUserAsync(user);
+            if (resUser == 1) throw new Exception();
+
+            var id = await _userService.GetUserIdAsync(user.Email);
+
+            var resUserProfile = await _profileService.CreateUserProfileAsync(new UserProfileModel { UserId = id });
+            if (resUserProfile == 1) throw new Exception();
+            var resUserContact = await _contactService.CreateUserContactsAsync(new ContactsModel { UserId = id, ContactEmail = user.Email });
+            if (resUserContact == 1) throw new Exception();
+            var resUserQualification = await _qualificationService.CreateUserQualificationAsync(new QualificationModel { UserId = id });
+            if (resUserQualification == 1) throw new Exception();
+
+            var person = new SendEmailDto() { Email = req.Email, Name = "", Subject = "Confirm email", MessageBody = EmailTemplates.RegistrationEmailTemplate.Replace("@email", req.Email) };
+            _logger.LogInformation("Начало отправки сообщения пользователю");
+            await _emailService.SendEmail(person);
+
+            _logger.LogInformation("Сообщение отправлено пользователю");
+            return Ok(req.Email);
+        }
+        catch (Exception ex)
+        {
+            //todo: удаление созданных сущностей профиля
+            _logger.LogError($"Ошибка при создании пользователя: \n {ex.Message} \n {ex.StackTrace}");
+            return StatusCode(500, new ProblemDetails
             {
-                try
-                {
-                    var queryFactory = new QueryFactory(connection, new PostgresCompiler())
-                    {
-                        Logger = compiled => Console.WriteLine(compiled.ToString())
-                    };
+                Title = "Internal server error",
+                Detail = $"Произошла ошибка при обработке запроса. \n {ex.Message}"
+            });
 
-                    await _userService.CreatedUserAsync(user, transaction, queryFactory);
-                    var id = await _userService.GetUserIdAsync(user.Email);
-
-                    await _profileService.CreateUserProfileAsync(new UserProfileModel { UserId = id }, transaction, queryFactory);
-                    await _contactService.CreateUserContactsAsync(new ContactsModel { UserId = id, ContactEmail = user.Email }, transaction, queryFactory);
-                    await _qualificationService.CreateUserQualificationAsync(new QualificationModel { UserId = id }, transaction, queryFactory);
-
-                    await transaction.CommitAsync();
-
-                    var person = new SendEmailDto() { Email = req.Email, Name = "", Subject = "Confirm email", MessageBody = EmailTemplates.RegistrationEmailTemplate.Replace("@email", req.Email) };
-                    _logger.LogInformation("Начало отправки сообщения пользователю");
-                    await _emailService.SendEmail(person);
-
-                    _logger.LogInformation("Сообщение отправлено пользователю");
-                    return Ok(req.Email);
-                }
-                catch (Exception ex)
-                {
-                    await transaction.RollbackAsync();
-                    _logger.LogError($"Ошибка при создании пользователя: \n {ex.Message} \n {ex.StackTrace}");
-                    return StatusCode(500, new ProblemDetails
-                    {
-                        Title = "Internal server error",
-                        Detail = $"Произошла ошибка при обработке запроса. \n {ex.Message}"
-                    });
-                }
-            }
         }
     }
 }

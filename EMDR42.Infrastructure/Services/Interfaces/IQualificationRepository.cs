@@ -25,7 +25,7 @@ public interface IQualificationRepository
     /// <param name="transaction"></param>
     /// <param name="query"></param>
     /// <returns></returns>
-    public Task CreateUserQualificationAsync(QualificationModel model, NpgsqlTransaction transaction, QueryFactory query);
+    public Task<int> CreateUserQualificationAsync(QualificationModel model);
     /// <summary>
     /// Обновление данных квалификации пользователя
     /// </summary>

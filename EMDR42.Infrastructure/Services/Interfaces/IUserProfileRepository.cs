@@ -20,7 +20,7 @@ public interface IUserProfileRepository
     /// <param name="transaction"></param>
     /// <param name="query"></param>
     /// <returns></returns>
-    public Task CreateUserProfileAsync(UserProfileModel model, NpgsqlTransaction transaction, QueryFactory query);
+    public Task<int> CreateUserProfileAsync(UserProfileModel model);
     /// <summary>
     /// Обновление данных профиля пользователя
     /// </summary>

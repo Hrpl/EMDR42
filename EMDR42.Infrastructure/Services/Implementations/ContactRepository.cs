@@ -23,14 +23,13 @@ public class ContactRepository : IContactRepository
     }
 
     
-    /// <inheritdoc />s
-    //todo
-    public async Task CreateUserContactsAsync(ContactsModel model, NpgsqlTransaction transaction, QueryFactory query)
+    /// <inheritdoc />
+    public async Task<int> CreateUserContactsAsync(ContactsModel model)
     {
-        var q = query.Query(TableName)
+        var q = _query.Query(TableName)
             .AsInsert(model);
 
-        await _query.ExecuteAsync(q, transaction);
+        return await _query.ExecuteAsync(q);
     }
 
     

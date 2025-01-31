@@ -25,7 +25,7 @@ public interface IContactRepository
     /// <param name="transaction"></param>
     /// <param name="query"></param>
     /// <returns></returns>
-    public Task CreateUserContactsAsync(ContactsModel model, NpgsqlTransaction transaction, QueryFactory query);
+    public Task<int> CreateUserContactsAsync(ContactsModel model);
     /// <summary>
     /// Обновление контактов пользователя
     /// </summary>

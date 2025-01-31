@@ -24,13 +24,12 @@ public class QualificationRepository : IQualificationRepository
     }
     
     /// <inheritdoc />
-    //todo:
-    public async Task CreateUserQualificationAsync(QualificationModel model, NpgsqlTransaction transaction, QueryFactory query)
+    public async Task<int> CreateUserQualificationAsync(QualificationModel model)
     {
-        var q = query.Query(TableName)
+        var query = _query.Query(TableName)
             .AsInsert(model);
 
-        await _query.ExecuteAsync(q, transaction);
+        return await _query.ExecuteAsync(query);
     }
 
     

@@ -33,17 +33,17 @@ public class UserRepository : IUserRepository
     }
     
     /// <inheritdoc />
-    //todo:
-    public async Task CreatedUserAsync(UserModel model, NpgsqlTransaction transaction, QueryFactory query)
+    public async Task<int> CreatedUserAsync(UserModel model)
     {
         string salt = _cryptographyService.GenerateSalt();
         string hashedPassword = _cryptographyService.HashPassword(model.Password, salt);
         model.Password = hashedPassword;
         model.Salt = salt;
 
-        var q = query.Query(TableName).AsInsert(model);
-
-        await _query.ExecuteAsync(q, transaction);
+        var query = _query.Query(TableName).AsInsert(model);
+        await _query.ExecuteAsync(query);
+        return 1;
+           
     }
 
     

@@ -23,13 +23,12 @@ public class UserProfileRepository : IUserProfileRepository
 
     
     /// <inheritdoc />
-    //todo:
-    public async Task CreateUserProfileAsync(UserProfileModel model, NpgsqlTransaction transaction, QueryFactory query)
+    public async Task<int> CreateUserProfileAsync(UserProfileModel model)
     {
-        var q = query.Query(TableName)
+        var query = _query.Query(TableName)
             .AsInsert(model);
 
-        await _query.ExecuteAsync(q, transaction);
+        return await _query.ExecuteAsync(query);
     }
 
     

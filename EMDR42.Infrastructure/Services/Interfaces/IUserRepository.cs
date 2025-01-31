@@ -13,7 +13,7 @@ public interface IUserRepository
     /// <param name="transaction"></param>
     /// <param name="query"></param>
     /// <returns></returns>
-    public Task CreatedUserAsync(UserModel model, NpgsqlTransaction transaction, QueryFactory query);
+    public Task<int> CreatedUserAsync(UserModel model);
     /// <summary>
     /// Получение данных о пользователи по его email
     /// </summary>
