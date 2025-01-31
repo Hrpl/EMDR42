@@ -1,4 +1,5 @@
 ﻿using EMDR42.Domain.Commons.DTO;
+using EMDR42.Domain.Commons.Request;
 using EMDR42.Domain.Models;
 using EMDR42.Infrastructure.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -31,7 +32,7 @@ public class ClientController : ControllerBase
     /// <returns></returns>
     [HttpGet]
     [SwaggerOperation(Summary = "Получение списка клиентов. Необходим JWT")]
-    public async Task<ActionResult<IEnumerable<ClientDTO>>> Get()
+    public async Task<ActionResult<IEnumerable<ClientDTO>>> Get([FromQuery] GetAllClientRequest request)
     {
         try
         {

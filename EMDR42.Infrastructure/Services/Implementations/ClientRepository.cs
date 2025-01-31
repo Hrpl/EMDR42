@@ -1,4 +1,6 @@
 ﻿using EMDR42.Domain.Commons.DTO;
+using EMDR42.Domain.Commons.Request;
+using EMDR42.Domain.Commons.Response;
 using EMDR42.Domain.Models;
 using EMDR42.Infrastructure.Services.Interfaces;
 using SqlKata.Execution;
@@ -76,17 +78,18 @@ public class ClientRepository : IClientRepository
         return await _query.ExecuteAsync(query);
     }
 
-    //public async Task<IEnumerable<GetCleintDTO>> GetAllClientAsync(int userId)
-    //{
-    //    var query = _query.Query(TableName)
-    //        .Where("UserId", userId)
-    //        .Select("UserName",
-    //        "Country",
-    //        "Language",
-    //        "Email");
+    public async Task<IEnumerable<ClientsResponse>> GetAllClientAsync(GetAllClientRequest request, int userId)
+    {
+        var query = _query.Query("Clients as c")
+            .Join("Sessions as s", "s.ClientId, s.UserId", "c.Id, c.UserId")
+            .Where("c.UserId", userId)
+            .When(!(request.IsArchived), q => q.Where("c.IsArchived", true))
+            .Select("c.UserName",
+            "c.Country",
+            "c.Email");
 
-    //    var result = await _query.GetAsync<GetCleintDTO>(query);
+        var result = await _query.GetAsync<ClientsResponse>(query);
 
-    //    return result;
-    //}
+        return result;
+    }
 }

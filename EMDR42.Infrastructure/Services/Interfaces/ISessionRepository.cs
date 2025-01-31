@@ -11,5 +11,5 @@ namespace EMDR42.Infrastructure.Services.Interfaces;
 public interface ISessionRepository
 {
     public Task<int> CreateSessionAsync(SessionModel model);
-    public Task<IEnumerable<SessionLogResponse>> GetSessionLogs(GetSessionLogs request, int userId);
+    public Task<IEnumerable<SessionLogResponse>> GetSessionLogs(GetSessionLogs request);
 }

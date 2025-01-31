@@ -47,7 +47,7 @@ public class SessionController : ControllerBase
                 });
             }
 
-            var result = await _sessionService.GetSessionLogs(request, Convert.ToInt32( userId));
+            var result = await _sessionService.GetSessionLogs(request);
 
             if (result == null)
             {
@@ -95,7 +95,6 @@ public class SessionController : ControllerBase
             }
 
             var model = _mapper.Map<SessionModel>(request);
-            model.UserId = Convert.ToInt32( userId);
 
             var result = await _sessionService.CreateSessionAsync(model);
 

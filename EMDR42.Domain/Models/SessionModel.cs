@@ -8,7 +8,6 @@ namespace EMDR42.Domain.Models;
 
 public class SessionModel
 {
-    public int UserId { get; set; }
     public int ClientId { get; set; }
     public string? Duration { get; set; }
     public DateTime? CreatedAt { get; set; } 

@@ -32,7 +32,7 @@ public class SessionRepository : ISessionRepository
         }
     }
 
-    public async Task<IEnumerable<SessionLogResponse>> GetSessionLogs(GetSessionLogs request, int userId)
+    public async Task<IEnumerable<SessionLogResponse>> GetSessionLogs(GetSessionLogs request)
     {
         ArgumentNullException.ThrowIfNull(request);
 
@@ -41,7 +41,6 @@ public class SessionRepository : ISessionRepository
             var query = _query.Query(TableName)
                 .Where("CreatedAt", ">", request.Start)
                 .Where("CreatedAt", "<", request.End)
-                .Where("UserId", userId)
                 .Where("ClientId", request.ClientId)
                 .Select("CreatedAt",
                 "Duration");

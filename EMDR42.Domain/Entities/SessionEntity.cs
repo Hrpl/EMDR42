@@ -8,7 +8,6 @@ namespace EMDR42.Domain.Entities;
 
 public class SessionEntity : BaseEntity
 {
-    public int UserId { get; set; }
     public int ClientId { get; set; }
     public string Duration { get; set; }
 }
