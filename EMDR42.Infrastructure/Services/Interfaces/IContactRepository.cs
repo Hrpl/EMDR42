@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace EMDR42.Infrastructure.Services.Interfaces;
 
-public interface IContactService
+public interface IContactRepository
 {
     public Task<ContactsDTO> GetUserContactsAsync(int id);
     public Task CreateUserContactsAsync(ContactsModel model, NpgsqlTransaction transaction, QueryFactory query);

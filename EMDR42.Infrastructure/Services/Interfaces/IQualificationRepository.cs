@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace EMDR42.Infrastructure.Services.Interfaces;
 
-public interface IQualificationService
+public interface IQualificationRepository
 {
     public Task<QualificationDTO> GetUserQualificationAsync(int id);
     public Task CreateUserQualificationAsync(QualificationModel model, NpgsqlTransaction transaction, QueryFactory query);

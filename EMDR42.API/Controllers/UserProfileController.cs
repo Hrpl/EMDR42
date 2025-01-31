@@ -15,9 +15,9 @@ namespace EMDR42.API.Controllers;
 public class UserProfileController : ControllerBase
 {
     private readonly IMapper _mapper;
-    private readonly IUserProfileService _userProfileService;
+    private readonly IUserProfileRepository _userProfileService;
     private readonly ILogger<UserProfileController> _logger;
-    public UserProfileController(IUserProfileService userProfileService, IMapper mapper, ILogger<UserProfileController> logger)
+    public UserProfileController(IUserProfileRepository userProfileService, IMapper mapper, ILogger<UserProfileController> logger)
     {
         _userProfileService = userProfileService ?? throw new ArgumentNullException(nameof(userProfileService));
         _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));

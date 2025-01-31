@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace EMDR42.Infrastructure.Services.Interfaces;
 
-public interface IClientService
+public interface IClientRepository
 {
     public Task CreateClientAsync(ClientModel model);
     //public Task<IEnumerable<>> GetAllClientAsync(int userId);

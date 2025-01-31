@@ -89,13 +89,13 @@ public static class AddServiceExtensions
     {
         services.AddScoped<IDbConnectionManager, DbConnectionManager>();
         services.AddScoped<IJwtHelper, JwtHelper>();
-        services.AddScoped<IUserService, UserService>();
-        services.AddScoped<IUserProfileService, UserProfileService>();
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IUserProfileRepository, UserProfileRepository>();
         services.AddScoped<IEmailService, EmailService>();
-        services.AddScoped<IContactService, ContactService>();
-        services.AddScoped<IQualificationService, QualificationService>();
+        services.AddScoped<IContactRepository, ContactRepository>();
+        services.AddScoped<IQualificationRepository, QualificationRepository>();
         services.AddScoped<ICryptographyService, CryptographyService>();
-        services.AddScoped<IClientService, ClientService>();
-        services.AddScoped<ISessionService, SessionService>();
+        services.AddScoped<IClientRepository, ClientRepository>();
+        services.AddScoped<ISessionRepository, SessionRepository>();
     }
 }

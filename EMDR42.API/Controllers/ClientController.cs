@@ -14,11 +14,11 @@ namespace EMDR42.API.Controllers;
 [Authorize]
 public class ClientController : ControllerBase
 {
-    private readonly IClientService _clientService;
+    private readonly IClientRepository _clientService;
     private readonly IMapper _mapper;
     private readonly ILogger<ClientController> _logger;
 
-    public ClientController(IMapper mapper, IClientService clientService, ILogger<ClientController> logger)
+    public ClientController(IMapper mapper, IClientRepository clientService, ILogger<ClientController> logger)
     {
         _clientService = clientService ?? throw new ArgumentNullException(nameof(clientService));
         _mapper = mapper ?? throw new ArgumentNullException(nameof(clientService));

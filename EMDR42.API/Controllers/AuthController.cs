@@ -14,14 +14,14 @@ namespace EMDR42.API.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IJwtHelper _jwtHelper;
-    private readonly IUserService _userService;
+    private readonly IUserRepository _userService;
     private readonly IMapper _mapper;
     private readonly ILogger<AuthController> _logger;
 
     public AuthController(
         IJwtHelper jwtHelper,
         IMapper mapper,
-        IUserService userService,
+        IUserRepository userService,
         ILogger<AuthController> logger)
     {
         _jwtHelper = jwtHelper ?? throw new ArgumentNullException(nameof(jwtHelper));

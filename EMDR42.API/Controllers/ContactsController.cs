@@ -16,10 +16,10 @@ namespace EMDR42.API.Controllers;
 [Authorize]
 public class ContactsController : ControllerBase
 {
-    private readonly IContactService _contactService;
+    private readonly IContactRepository _contactService;
     private readonly IMapper _mapper;
     private readonly ILogger<ContactsController> _logger;
-    public ContactsController(IContactService contactService, IMapper mapper, ILogger<ContactsController> logger)
+    public ContactsController(IContactRepository contactService, IMapper mapper, ILogger<ContactsController> logger)
     {
         _contactService = contactService ?? throw new ArgumentNullException(nameof(contactService));
         _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));

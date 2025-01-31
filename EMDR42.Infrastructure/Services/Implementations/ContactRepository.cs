@@ -13,11 +13,11 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace EMDR42.Infrastructure.Services.Implementations;
 
-public class ContactService : IContactService
+public class ContactRepository : IContactRepository
 {
     private readonly QueryFactory _query;
     private const string TableName = "Contacts";
-    public ContactService(IDbConnectionManager dbConnectionManager)
+    public ContactRepository(IDbConnectionManager dbConnectionManager)
     {
         _query = dbConnectionManager.PostgresQueryFactory;
     }

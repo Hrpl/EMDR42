@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace EMDR42.Infrastructure.Services.Interfaces;
 
-public interface ISessionService
+public interface ISessionRepository
 {
     public Task<int> CreateSessionAsync(SessionModel model);
     public Task<IEnumerable<SessionLogResponse>> GetSessionLogs(GetSessionLogs request, int userId);

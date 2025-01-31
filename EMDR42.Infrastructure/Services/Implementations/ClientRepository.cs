@@ -10,11 +10,11 @@ using System.Threading.Tasks;
 
 namespace EMDR42.Infrastructure.Services.Implementations;
 
-public class ClientService : IClientService
+public class ClientRepository : IClientRepository
 {
     private readonly QueryFactory _query;
     private const string TableName = "Clients";
-    public ClientService(IDbConnectionManager connectionManager)
+    public ClientRepository(IDbConnectionManager connectionManager)
     {
         _query = connectionManager.PostgresQueryFactory;
     }

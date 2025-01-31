@@ -16,9 +16,9 @@ namespace EMDR42.API.Controllers;
 public class SessionController : ControllerBase
 {
     private readonly IMapper _mapper;
-    private readonly ISessionService _sessionService;
+    private readonly ISessionRepository _sessionService;
     private readonly ILogger<SessionController> _logger;
-    public SessionController( ISessionService sessionService, IMapper mapper, ILogger<SessionController> logger)
+    public SessionController( ISessionRepository sessionService, IMapper mapper, ILogger<SessionController> logger)
     {
         _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         _sessionService = sessionService ?? throw new ArgumentNullException(nameof(sessionService));

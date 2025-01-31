@@ -6,12 +6,12 @@ using SqlKata.Execution;
 
 namespace EMDR42.Infrastructure.Services.Implementations;
 
-public class SessionService : ISessionService
+public class SessionRepository : ISessionRepository
 {
     private readonly QueryFactory _query;
-    private readonly ILogger<SessionService> _logger;
+    private readonly ILogger<SessionRepository> _logger;
     private const string TableName = "Sessions";
-    public SessionService(IDbConnectionManager dbConnection, ILogger<SessionService> logger)
+    public SessionRepository(IDbConnectionManager dbConnection, ILogger<SessionRepository> logger)
     {
         _query = dbConnection.PostgresQueryFactory ?? throw new ArgumentNullException(nameof(dbConnection));
         _logger = logger;

@@ -19,22 +19,22 @@ namespace EMDR42.API.Controllers;
 public class UserController : ControllerBase
 {
     private readonly IEmailService _emailService;
-    private readonly IUserService _userService;
+    private readonly IUserRepository _userService;
     private readonly IMapper _mapper;
     private readonly ILogger<UserController> _logger;
-    private readonly IUserProfileService _profileService;
-    private readonly IContactService _contactService;
-    private readonly IQualificationService _qualificationService;
+    private readonly IUserProfileRepository _profileService;
+    private readonly IContactRepository _contactService;
+    private readonly IQualificationRepository _qualificationService;
     private readonly IDbConnectionManager _dbConnectionManager;
 
     public UserController(
         IEmailService emailService,
         IMapper mapper,
-        IUserService userService,
+        IUserRepository userService,
         ILogger<UserController> logger,
-        IUserProfileService profileService,
-        IContactService contactService,
-        IQualificationService qualificationService,
+        IUserProfileRepository profileService,
+        IContactRepository contactService,
+        IQualificationRepository qualificationService,
         IDbConnectionManager dbConnectionManager)
     {
         _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
@@ -130,7 +130,7 @@ public class UserController : ControllerBase
 
         var user = _mapper.Map<UserModel>(req);
         //todo:
-        using(var connection = _dbConnectionManager.PostgresDbConnection)
+        using (var connection = _dbConnectionManager.PostgresDbConnection)
         {
             await connection.OpenAsync();
 

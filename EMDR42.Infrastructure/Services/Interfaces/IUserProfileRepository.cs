@@ -5,7 +5,7 @@ using SqlKata.Execution;
 
 namespace EMDR42.Infrastructure.Services.Interfaces;
 
-public interface IUserProfileService
+public interface IUserProfileRepository
 {
     public Task<GetUserProfileDTO> GetUserProfilesAsync(int id);
     public Task CreateUserProfileAsync(UserProfileModel model, NpgsqlTransaction transaction, QueryFactory query);

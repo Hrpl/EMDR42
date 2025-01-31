@@ -1,26 +1,29 @@
 ﻿using EMDR42.Domain.Commons.DTO;
 using EMDR42.Domain.Models;
 using EMDR42.Infrastructure.Services.Interfaces;
+using MapsterMapper;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Npgsql;
-using SqlKata;
 using SqlKata.Execution;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace EMDR42.Infrastructure.Services.Implementations;
 
-public class UserProfileService : IUserProfileService
+public class QualificationRepository : IQualificationRepository
 {
     private readonly QueryFactory _query;
-    private const string TableName = "UserProfile";
-    public UserProfileService(IDbConnectionManager connectionManager)
+    private const string TableName = "Qualifications";
+    public QualificationRepository(IDbConnectionManager dbConnection)
     {
-        _query = connectionManager.PostgresQueryFactory;
+        _query = dbConnection.PostgresQueryFactory;
     }
-    public async Task CreateUserProfileAsync(UserProfileModel model, NpgsqlTransaction transaction, QueryFactory query)
+
+    public async Task CreateUserQualificationAsync(QualificationModel model, NpgsqlTransaction transaction, QueryFactory query)
     {
         var q = query.Query(TableName)
             .AsInsert(model);
@@ -28,31 +31,27 @@ public class UserProfileService : IUserProfileService
         await _query.ExecuteAsync(q, transaction);
     }
 
-    public async Task<GetUserProfileDTO> GetUserProfilesAsync(int id)
+    public async Task<QualificationDTO> GetUserQualificationAsync(int id)
     {
         var query = _query.Query(TableName)
             .Where("UserId", id)
-            .Select("Name",
-            "Surname",
-            "Patronymic",
-            "Gender",
-            "Birthday",
-            "Address",
-            "IsPublic");
+            .Select("School",
+            "Supervisor",
+            "InPractic");
 
-        var result = await _query.FirstOrDefaultAsync<GetUserProfileDTO>(query);
+        var result = await _query.FirstOrDefaultAsync<QualificationDTO>(query);
 
         return result;
     }
 
-    public async Task<int> UpdateUserProfileAsync(UserProfileModel model)
+    public async Task<int> UpdateUserQualificationAsync(QualificationModel model)
     {
         var query = _query.Query(TableName).Where("UserId", model.UserId).AsUpdate(model);
 
         return await _query.ExecuteAsync(query);
     }
 
-    public async Task DeleteUserProfileAsync(int id)
+    public async Task DeleteUserQualificationAsync(int id)
     {
         var query = _query.Query(TableName).Where("UserId", id).AsDelete();
 

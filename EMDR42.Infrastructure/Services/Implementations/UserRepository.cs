@@ -6,13 +6,13 @@ using SqlKata.Execution;
 
 namespace EMDR42.Infrastructure.Services.Implementations;
 
-public class UserService : IUserService
+public class UserRepository : IUserRepository
 {
     private readonly QueryFactory _query;
     private readonly ICryptographyService _cryptographyService;
     private readonly string TableName = "Users";
 
-    public UserService(IDbConnectionManager connectionManager, ICryptographyService cryptographyService)
+    public UserRepository(IDbConnectionManager connectionManager, ICryptographyService cryptographyService)
     {
         _query = connectionManager.PostgresQueryFactory;
         _cryptographyService = cryptographyService;

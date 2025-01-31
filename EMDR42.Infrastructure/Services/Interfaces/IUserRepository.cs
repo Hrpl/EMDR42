@@ -4,7 +4,7 @@ using SqlKata.Execution;
 
 namespace EMDR42.Infrastructure.Services.Interfaces;
 
-public interface IUserService
+public interface IUserRepository
 {
     public Task CreatedUserAsync(UserModel model, NpgsqlTransaction transaction, QueryFactory query);
     public Task<UserModel> GetUserAsync(string login);

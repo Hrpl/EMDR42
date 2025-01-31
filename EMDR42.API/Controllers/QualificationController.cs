@@ -15,10 +15,10 @@ namespace EMDR42.API.Controllers;
 [Authorize]
 public class QualificationController : ControllerBase
 {
-    private readonly IQualificationService _qualificationService;
+    private readonly IQualificationRepository _qualificationService;
     private readonly IMapper _mapper;
     private readonly ILogger<QualificationController> _logger;
-    public QualificationController(IQualificationService qualificationService, IMapper mapper, ILogger<QualificationController> logger)
+    public QualificationController(IQualificationRepository qualificationService, IMapper mapper, ILogger<QualificationController> logger)
     {
         _qualificationService = qualificationService ?? throw new ArgumentNullException(nameof(qualificationService));
         _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
