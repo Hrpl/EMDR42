@@ -77,7 +77,6 @@ public class UserService : IUserService
 
     public async Task<bool> LoginUserAsync(LoginRequest request)
     {
-        //todo: salt
         var query = _query.Query(TableName)
             .Where("Email", request.Email)
             .Select("Password",
@@ -92,13 +91,13 @@ public class UserService : IUserService
         else return false;
     }
 
-    public async Task UserConfirmAsync(string login)
+    public async Task<int> UserConfirmAsync(string login)
     {
         var query = _query.Query(TableName).Where("Email", login).AsUpdate(new
         {
             IsConfirmed = true
         });
 
-        await _query.ExecuteAsync(query);
+        return await _query.ExecuteAsync(query);
     }
 }

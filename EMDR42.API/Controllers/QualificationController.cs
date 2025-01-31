@@ -16,66 +16,103 @@ namespace EMDR42.API.Controllers;
 public class QualificationController : ControllerBase
 {
     private readonly IQualificationService _qualificationService;
-    private readonly IJwtHelper _jwtHelper;
     private readonly IMapper _mapper;
-    public QualificationController(IQualificationService qualificationService, IJwtHelper jwtHelper, IMapper mapper)
+    private readonly ILogger<QualificationController> _logger;
+    public QualificationController(IQualificationService qualificationService, IMapper mapper, ILogger<QualificationController> logger)
     {
-        _qualificationService = qualificationService;
-        _jwtHelper = jwtHelper;
-        _mapper = mapper;
+        _qualificationService = qualificationService ?? throw new ArgumentNullException(nameof(qualificationService));
+        _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+        _logger = logger;
     }
 
+    /// <summary>
+    /// Получение данных о квалификации пользователя
+    /// </summary>
+    /// <returns></returns>
     [HttpGet("{id}")]
     [SwaggerOperation(Summary = "Получение данных о квалификации пользователя. Необходим JWT")]
     public async Task<ActionResult<QualificationDTO>> Get()
     {
         try
         {
-            var authorizationHeader = HttpContext.Request.Headers["Authorization"].FirstOrDefault();
+            var userId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
 
-            if (authorizationHeader != null && authorizationHeader.StartsWith("Bearer "))
+            if (string.IsNullOrEmpty(userId))
             {
-                var token = authorizationHeader.Substring("Bearer ".Length).Trim();
-                var id = await _jwtHelper.DecodJwt(token);
-
-                var response = await _qualificationService.GetUserQualificationAsync(id);
-
-                if (response != null) return Ok();
-                else return BadRequest();
+                return Unauthorized(new ProblemDetails
+                {
+                    Title = "Unauthorized",
+                    Detail = "Invalid user ID in token."
+                });
             }
-            else return Unauthorized();
+
+            var response = await _qualificationService.GetUserQualificationAsync(Convert.ToInt32(userId));
+
+            if (response == null)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "BadRequest",
+                    Detail = "При запросе данных произошла ошибка"
+                });
+            }
+            return Ok(response);
         }
         catch (Exception ex)
         {
-            return BadRequest(ex.Message);
+            return StatusCode(500, new ProblemDetails
+            {
+                Title = "Internal server error",
+                Detail = $"Произошла ошибка при обработке запроса. \n {ex.Message}"
+            });
         }
     }
 
-    // PUT api/<QualificationController>/5
-    [HttpPut("{id}")]
+    /// <summary>
+    /// Обновление данных о квалификации пользователя
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    [HttpPut]
     [SwaggerOperation(Summary = "Обновление данных о квалификации пользователя. Необходим JWT")]
     public async Task<ActionResult> Put([FromBody] QualificationDTO request)
     {
         try
         {
-            var authorizationHeader = HttpContext.Request.Headers["Authorization"].FirstOrDefault();
+            var userId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
 
-            if (authorizationHeader != null && authorizationHeader.StartsWith("Bearer "))
+            if (string.IsNullOrEmpty(userId))
             {
-                var token = authorizationHeader.Substring("Bearer ".Length).Trim();
-                var id = await _jwtHelper.DecodJwt(token);
-
-                var model = _mapper.Map<QualificationModel>(request);
-                model.UserId = id;
-
-                await _qualificationService.UpdateUserQualificationAsync(model);
-                return Ok();
+                return Unauthorized(new ProblemDetails
+                {
+                    Title = "Unauthorized",
+                    Detail = "Invalid user ID in token."
+                });
             }
-            else return Unauthorized();
+
+            var model = _mapper.Map<QualificationModel>(request);
+            model.UserId = Convert.ToInt32(userId);
+
+            var result = await _qualificationService.UpdateUserQualificationAsync(model);
+            if (result != 1)
+            {
+                _logger.LogError($"Произошла ошибка при обновлении данных о квалификации пользователя");
+                return NotFound(new ProblemDetails
+                {
+                    Title = "NotFound",
+                    Detail = "Произошла ошибка при обновлении данных о квалификации пользователя"
+                });
+            }
+            return NoContent();
+
         }
         catch (Exception ex)
         {
-            return BadRequest(ex.Message);
+            return StatusCode(500, new ProblemDetails
+            {
+                Title = "Internal server error",
+                Detail = $"Произошла ошибка при обработке запроса. \n {ex.Message}"
+            });
         }
     }
 }

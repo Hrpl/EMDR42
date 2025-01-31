@@ -14,6 +14,6 @@ public interface IQualificationService
 {
     public Task<QualificationDTO> GetUserQualificationAsync(int id);
     public Task CreateUserQualificationAsync(QualificationModel model, NpgsqlTransaction transaction, QueryFactory query);
-    public Task UpdateUserQualificationAsync(QualificationModel model);
+    public Task<int> UpdateUserQualificationAsync(QualificationModel model);
     public Task DeleteUserQualificationAsync(int id);
 }

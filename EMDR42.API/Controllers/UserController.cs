@@ -8,6 +8,7 @@ using MapsterMapper;
 using Microsoft.AspNetCore.Mvc;
 using SqlKata.Compilers;
 using SqlKata.Execution;
+using Swashbuckle.AspNetCore.Annotations;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -36,57 +37,99 @@ public class UserController : ControllerBase
         IQualificationService qualificationService,
         IDbConnectionManager dbConnectionManager)
     {
-        _emailService = emailService;
-        _userService = userService;
-        _mapper = mapper;
-        _logger = logger;
-        _profileService = profileService;
-        _contactService = contactService;
-        _qualificationService = qualificationService;
-        _dbConnectionManager = dbConnectionManager;
+        _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
+        _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+        _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+        _logger = logger ;
+        _profileService = profileService ?? throw new ArgumentNullException(nameof(profileService));
+        _contactService = contactService ?? throw new ArgumentNullException(nameof(contactService));
+        _qualificationService = qualificationService ?? throw new ArgumentNullException(nameof(qualificationService));
+        _dbConnectionManager = dbConnectionManager ?? throw new ArgumentNullException(nameof(dbConnectionManager));
     }
 
+    /// <summary>
+    /// Подтверждение почты пользователя
+    /// </summary>
+    /// <param name="email"></param>
+    /// <returns></returns>
     [HttpGet("confirm")]
-    public async Task<IActionResult> Get([FromQuery] string email)
+    [SwaggerOperation(Summary = "Подтверждение почты пользователя")]
+    public async Task<ActionResult> Get([FromQuery] string email)
     {
-        var user = await _userService.CheckedUserByLoginAsync(email);
-        if (user is true)
+        try
         {
-            _logger.LogInformation("Пользователь прошёл проверку");
-            await _userService.UserConfirmAsync(email);
+            var user = await _userService.CheckedUserByLoginAsync(email);
+            if (user)
+            {
+                _logger.LogInformation("Пользователь прошёл проверку");
+                var result = await _userService.UserConfirmAsync(email);
 
-            string htmlContent = @"
-            <html>
-            <head>
-                <meta charset=""UTF-8"">
-                <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
-                <title>Redirecting...</title>
-            </head>
-            <body>
-                <center>
-                    <h1>Ваш email подтверждён</h1>
-                    <h2>Теперь вы можете авторизоваться в приложении</h2>
-                </center>
-            </body>
-            </html>";
-            return Content(htmlContent, "text/html");
+                if (result != 1)
+                {
+                    _logger.LogError($"Произошла ошибка при подтверждении пользователя");
+                    return NotFound(new ProblemDetails
+                    {
+                        Title = "NotFound",
+                        Detail = "Произошла ошибка при подтверждении пользователя"
+                    });
+                }
+
+                string htmlContent = ResponseTemplate.ConfirmResponse;
+                return Content(htmlContent, "text/html");
+            }
+            else
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "BadRequest",
+                    Detail = "Неверный email адрес!"
+                });
+            }
         }
-        else return BadRequest("Неверный email адрес!");
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while fetching clients.");
+            return StatusCode(500, new ProblemDetails
+            {
+                Title = "Internal server error",
+                Detail = $"Произошла ошибка при обработке запроса. \n {ex.Message}"
+            });
+        }
     }
 
-    // POST api/<UserController>
+    /// <summary>
+    /// Создание нового пользователя в системе
+    /// </summary>
+    /// <param name="req"></param>
+    /// <returns></returns>
     [HttpPost("create")]
+    [SwaggerOperation(Summary = "Создание нового пользователя в системе")]
     public async Task<ActionResult> Create([FromBody] LoginRequest req)
     {
-        if (req.Email == "") return BadRequest("Поле Email не заполнено");
-        _logger.LogError("Поле Email не заполнено");
+        if (req.Email == "")
+        {
+            _logger.LogError("Поле Email не заполнено");
+            return BadRequest(new ProblemDetails
+            {
+                Title = "BadRequest",
+                Detail = "Поле Email не заполнено"
+            });
+        } 
 
         var findEmail = await _userService.CheckedUserByLoginAsync(req.Email);
 
-        if (findEmail) return BadRequest("Пользователь с таким email уже существует");
-        _logger.LogError("Пользователь с таким email уже существует");
+        if (findEmail) 
+        {
+            _logger.LogError("Пользователь с таким email уже существует");
+            return BadRequest(new ProblemDetails
+            {
+                Title = "BadRequest",
+                Detail = "Пользователь с таким email уже существует"
+            });
+        } 
 
         var user = _mapper.Map<UserModel>(req);
+        //todo:
         using(var connection = _dbConnectionManager.PostgresDbConnection)
         {
             await connection.OpenAsync();
@@ -120,7 +163,11 @@ public class UserController : ControllerBase
                 {
                     await transaction.RollbackAsync();
                     _logger.LogError("Ошибка при создании пользователя");
-                    return BadRequest("Ошибка при создании пользователя: " + ex);
+                    return StatusCode(500, new ProblemDetails
+                    {
+                        Title = "Internal server error",
+                        Detail = $"Произошла ошибка при обработке запроса. \n {ex.Message}"
+                    });
                 }
             }
         }

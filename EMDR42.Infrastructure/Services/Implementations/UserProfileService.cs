@@ -45,11 +45,11 @@ public class UserProfileService : IUserProfileService
         return result;
     }
 
-    public async Task UpdateUserProfileAsync(UserProfileModel model)
+    public async Task<int> UpdateUserProfileAsync(UserProfileModel model)
     {
         var query = _query.Query(TableName).Where("UserId", model.UserId).AsUpdate(model);
 
-        await _query.ExecuteAsync(query);
+        return await _query.ExecuteAsync(query);
     }
 
     public async Task DeleteUserProfileAsync(int id)

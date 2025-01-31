@@ -9,6 +9,6 @@ public interface IUserProfileService
 {
     public Task<GetUserProfileDTO> GetUserProfilesAsync(int id);
     public Task CreateUserProfileAsync(UserProfileModel model, NpgsqlTransaction transaction, QueryFactory query);
-    public Task UpdateUserProfileAsync(UserProfileModel model);
+    public Task<int> UpdateUserProfileAsync(UserProfileModel model);
     public Task DeleteUserProfileAsync(int id);
 }

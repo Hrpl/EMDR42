@@ -44,11 +44,11 @@ public class QualificationService : IQualificationService
         return result;
     }
 
-    public async Task UpdateUserQualificationAsync(QualificationModel model)
+    public async Task<int> UpdateUserQualificationAsync(QualificationModel model)
     {
         var query = _query.Query(TableName).Where("UserId", model.UserId).AsUpdate(model);
 
-        await _query.ExecuteAsync(query);
+        return await _query.ExecuteAsync(query);
     }
 
     public async Task DeleteUserQualificationAsync(int id)

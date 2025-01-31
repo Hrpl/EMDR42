@@ -95,7 +95,7 @@ public class ContactsController : ControllerBase
             }
 
             var model = _mapper.Map<ContactsModel>(request);
-            model.UserId = Convert.ToInt32( userId);
+            model.UserId = Convert.ToInt32(userId);
 
             var result = await _contactService.UpdateUserContactsAsync(model);
             if (result != 1)

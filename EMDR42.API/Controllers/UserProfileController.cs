@@ -1,5 +1,6 @@
 ﻿using EMDR42.Domain.Commons.DTO;
 using EMDR42.Domain.Models;
+using EMDR42.Infrastructure.Services.Implementations;
 using EMDR42.Infrastructure.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,66 +14,106 @@ namespace EMDR42.API.Controllers;
 [Authorize]
 public class UserProfileController : ControllerBase
 {
-    private readonly IJwtHelper _jwtHelper;
     private readonly IMapper _mapper;
     private readonly IUserProfileService _userProfileService;
-    public UserProfileController(IUserProfileService userProfileService, IJwtHelper jwtHelper, IMapper mapper)
+    private readonly ILogger<UserProfileController> _logger;
+    public UserProfileController(IUserProfileService userProfileService, IMapper mapper, ILogger<UserProfileController> logger)
     {
-        _userProfileService = userProfileService;
-        _jwtHelper = jwtHelper;
-        _mapper = mapper;
+        _userProfileService = userProfileService ?? throw new ArgumentNullException(nameof(userProfileService));
+        _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+        _logger = logger;
     }
 
+    /// <summary>
+    /// Получение основной информации пользователя
+    /// </summary>
+    /// <returns></returns>
     [HttpGet]
     [SwaggerOperation(Summary = "Получение основной информации пользователя. Необходим JWT")]
     public async Task<ActionResult<GetUserProfileDTO>> Get()
     {
         try
         {
-            var authorizationHeader = HttpContext.Request.Headers["Authorization"].FirstOrDefault();
+            var userId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
 
-            if (authorizationHeader != null && authorizationHeader.StartsWith("Bearer "))
+            if (string.IsNullOrEmpty(userId))
             {
-                var token = authorizationHeader.Substring("Bearer ".Length).Trim();
-                var id = await _jwtHelper.DecodJwt(token);
-
-                var response = await _userProfileService.GetUserProfilesAsync(id);
-
-                if(response != null) return Ok();
-                else return BadRequest();
+                return Unauthorized(new ProblemDetails
+                {
+                    Title = "Unauthorized",
+                    Detail = "Invalid user ID in token."
+                });
             }
-            else return Unauthorized();
+
+            var response = await _userProfileService.GetUserProfilesAsync(Convert.ToInt32(userId));
+
+            if (response == null)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "BadRequest",
+                    Detail = "При запросе данных произошла ошибка"
+                });
+            }
+            return Ok(response);
         }
         catch (Exception ex)
         {
-            return BadRequest(ex.Message);
+            _logger.LogError(ex, "An error occurred while fetching clients.");
+            return StatusCode(500, new ProblemDetails
+            {
+                Title = "Internal server error",
+                Detail = $"Произошла ошибка при обработке запроса. \n {ex.Message}"
+            });
         }
     }
 
+    /// <summary>
+    /// Обновление основной информации пользователя.
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
     [HttpPut]
     [SwaggerOperation(Summary = "Обновление основной информации пользователя. Необходим JWT")]
     public async Task<ActionResult> Put([FromBody] GetUserProfileDTO request)
     {
         try
         {
-            var authorizationHeader = HttpContext.Request.Headers["Authorization"].FirstOrDefault();
+            var userId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
 
-            if (authorizationHeader != null && authorizationHeader.StartsWith("Bearer "))
+            if (string.IsNullOrEmpty(userId))
             {
-                var token = authorizationHeader.Substring("Bearer ".Length).Trim();
-                var id = await _jwtHelper.DecodJwt(token);
-
-                var model = _mapper.Map<UserProfileModel>(request);
-                model.UserId = id;
-
-                await _userProfileService.UpdateUserProfileAsync( model);
-                return Ok();
+                return Unauthorized(new ProblemDetails
+                {
+                    Title = "Unauthorized",
+                    Detail = "Invalid user ID in token."
+                });
             }
-            else return Unauthorized();
+
+            var model = _mapper.Map<UserProfileModel>(request);
+            model.UserId = Convert.ToInt32(userId);
+
+            var result = await _userProfileService.UpdateUserProfileAsync(model);
+            if (result != 1)
+            {
+                _logger.LogError($"Произошла ошибка при обновлении контактов пользователя");
+                return NotFound(new ProblemDetails
+                {
+                    Title = "NotFound",
+                    Detail = "Произошла ошибка при обновлении контактов пользователя"
+                });
+            }
+            return NoContent();
+
         }
         catch (Exception ex)
         {
-            return BadRequest(ex.Message);
+            _logger.LogError(ex, "An error occurred while fetching clients.");
+            return StatusCode(500, new ProblemDetails
+            {
+                Title = "Internal server error",
+                Detail = $"Произошла ошибка при обработке запроса. \n {ex.Message}"
+            });
         }
     }
 }
