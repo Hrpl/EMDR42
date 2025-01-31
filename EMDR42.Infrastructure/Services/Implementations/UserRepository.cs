@@ -18,11 +18,8 @@ public class UserRepository : IUserRepository
         _cryptographyService = cryptographyService;
     }
 
-    /// <summary>
-    /// Проверка наличия пользователя по email
-    /// </summary>
-    /// <param name="login"></param>
-    /// <returns></returns>
+    
+    /// <inheritdoc />
     public async Task<bool> CheckedUserByLoginAsync(string login)
     {
         var query = _query.Query(TableName)
@@ -34,13 +31,8 @@ public class UserRepository : IUserRepository
         if (result != null) return true;
         else return false;
     }
-    /// <summary>
-    /// Создание нового пользователя в системе
-    /// </summary>
-    /// <param name="model"></param>
-    /// <param name="transaction"></param>
-    /// <param name="query"></param>
-    /// <returns></returns>
+    
+    /// <inheritdoc />
     //todo:
     public async Task CreatedUserAsync(UserModel model, NpgsqlTransaction transaction, QueryFactory query)
     {
@@ -54,11 +46,8 @@ public class UserRepository : IUserRepository
         await _query.ExecuteAsync(q, transaction);
     }
 
-    /// <summary>
-    /// Удаление пользователя по email
-    /// </summary>
-    /// <param name="login"></param>
-    /// <returns></returns>
+    
+    /// <inheritdoc />
     public async Task DeleteUserAsync(string login)
     {
         var query = _query.Query(TableName).Where("email", login).AsDelete();
@@ -66,11 +55,8 @@ public class UserRepository : IUserRepository
         await _query.ExecuteAsync(query);
     }
 
-    /// <summary>
-    /// Получение данных о пользователи по его email
-    /// </summary>
-    /// <param name="login"></param>
-    /// <returns></returns>
+    
+    /// <inheritdoc />
     public Task<UserModel> GetUserAsync(string login)
     {
         var query = _query.Query(TableName)
@@ -87,11 +73,8 @@ public class UserRepository : IUserRepository
         return result;
     }
 
-    /// <summary>
-    /// Получение id пользователя по его email
-    /// </summary>
-    /// <param name="login"></param>
-    /// <returns></returns>
+    
+    /// <inheritdoc />
     public async Task<int> GetUserIdAsync(string login)
     {
         var query = _query.Query(TableName)
@@ -102,11 +85,8 @@ public class UserRepository : IUserRepository
         return result;
     }
 
-    /// <summary>
-    /// Авторизация пользователя
-    /// </summary>
-    /// <param name="request"></param>
-    /// <returns></returns>
+    
+    /// <inheritdoc />
     public async Task<bool> LoginUserAsync(LoginRequest request)
     {
         var query = _query.Query(TableName)
@@ -123,11 +103,8 @@ public class UserRepository : IUserRepository
         else return false;
     }
 
-    /// <summary>
-    /// Подтверждение электронной почты пользователя
-    /// </summary>
-    /// <param name="login"></param>
-    /// <returns></returns>
+    
+    /// <inheritdoc />
     public async Task<int> UserConfirmAsync(string login)
     {
         var query = _query.Query(TableName).Where("email", login).AsUpdate(new

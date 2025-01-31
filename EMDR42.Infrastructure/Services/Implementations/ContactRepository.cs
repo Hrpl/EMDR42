@@ -22,14 +22,8 @@ public class ContactRepository : IContactRepository
         _query = dbConnectionManager.PostgresQueryFactory;
     }
 
-    /// <summary>
-    /// Создание части профиля с контактами
-    /// </summary>
-    /// <param name="model"></param>
-    /// <param name="transaction"></param>
-    /// <param name="query"></param>
-    /// <returns></returns>
     
+    /// <inheritdoc />s
     //todo
     public async Task CreateUserContactsAsync(ContactsModel model, NpgsqlTransaction transaction, QueryFactory query)
     {
@@ -39,11 +33,8 @@ public class ContactRepository : IContactRepository
         await _query.ExecuteAsync(q, transaction);
     }
 
-    /// <summary>
-    /// Получение контактов пользователя
-    /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
+    
+    /// <inheritdoc />
     public async Task<ContactsDTO> GetUserContactsAsync(int id)
     {
         var query = _query.Query(TableName)
@@ -57,11 +48,8 @@ public class ContactRepository : IContactRepository
         return result;
     }
 
-    /// <summary>
-    /// Обновление контактов пользователя
-    /// </summary>
-    /// <param name="model"></param>
-    /// <returns></returns>
+    
+    /// <inheritdoc />
     public async Task<int> UpdateUserContactsAsync(ContactsModel model)
     {
         var query = _query.Query(TableName).Where("user_id", model.UserId).AsUpdate(model);
@@ -69,11 +57,8 @@ public class ContactRepository : IContactRepository
         return await _query.ExecuteAsync(query);
     }
 
-    /// <summary>
-    /// Удаление записи о контактах пользователя
-    /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
+    
+    /// <inheritdoc />
     public async Task DeleteUserContactsAsync(int id)
     {
         var query = _query.Query(TableName).Where("user_id", id).AsDelete();

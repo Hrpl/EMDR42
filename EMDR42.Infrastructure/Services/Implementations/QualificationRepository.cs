@@ -22,13 +22,8 @@ public class QualificationRepository : IQualificationRepository
     {
         _query = dbConnection.PostgresQueryFactory;
     }
-    /// <summary>
-    /// Создание записи о квалификации пользователя
-    /// </summary>
-    /// <param name="model"></param>
-    /// <param name="transaction"></param>
-    /// <param name="query"></param>
-    /// <returns></returns>
+    
+    /// <inheritdoc />
     //todo:
     public async Task CreateUserQualificationAsync(QualificationModel model, NpgsqlTransaction transaction, QueryFactory query)
     {
@@ -38,11 +33,8 @@ public class QualificationRepository : IQualificationRepository
         await _query.ExecuteAsync(q, transaction);
     }
 
-    /// <summary>
-    /// Получение квалификации пользователя
-    /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
+    
+    /// <inheritdoc />
     public async Task<QualificationDTO> GetUserQualificationAsync(int id)
     {
         var query = _query.Query(TableName)
@@ -56,11 +48,8 @@ public class QualificationRepository : IQualificationRepository
         return result;
     }
 
-    /// <summary>
-    /// Обновление данных квалификации пользователя
-    /// </summary>
-    /// <param name="model"></param>
-    /// <returns></returns>
+    
+    /// <inheritdoc />
     public async Task<int> UpdateUserQualificationAsync(QualificationModel model)
     {
         var query = _query.Query(TableName).Where("user_id", model.UserId).AsUpdate(model);
@@ -68,11 +57,8 @@ public class QualificationRepository : IQualificationRepository
         return await _query.ExecuteAsync(query);
     }
 
-    /// <summary>
-    /// Удаление записи о квалификации пользователя
-    /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
+    
+    /// <inheritdoc />
     public async Task DeleteUserQualificationAsync(int id)
     {
         var query = _query.Query(TableName).Where("user_id", id).AsDelete();

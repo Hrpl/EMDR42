@@ -17,11 +17,8 @@ public class SessionRepository : ISessionRepository
         _logger = logger;
     }
 
-    /// <summary>
-    /// Создание записи о сессии
-    /// </summary>
-    /// <param name="model"></param>
-    /// <returns></returns>
+    
+    /// <inheritdoc />
     public async Task<int> CreateSessionAsync(SessionModel model)
     {
         ArgumentNullException.ThrowIfNull(model);
@@ -37,11 +34,8 @@ public class SessionRepository : ISessionRepository
             throw; 
         }
     }
-    /// <summary>
-    /// Получение логов сессии
-    /// </summary>
-    /// <param name="request"></param>
-    /// <returns></returns>
+    
+    /// <inheritdoc />
     public async Task<IEnumerable<SessionLogResponse>> GetSessionLogs(GetSessionLogs request)
     {
         ArgumentNullException.ThrowIfNull(request);

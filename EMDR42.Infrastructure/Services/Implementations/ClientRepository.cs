@@ -21,11 +21,8 @@ public class ClientRepository : IClientRepository
         _query = connectionManager.PostgresQueryFactory;
     }
 
-    /// <summary>
-    /// Создание клиента
-    /// </summary>
-    /// <param name="model"></param>
-    /// <returns></returns>
+    
+    /// <inheritdoc />
     public async Task CreateClientAsync(ClientModel model)
     {
         var query = _query.Query(TableName)
@@ -34,11 +31,8 @@ public class ClientRepository : IClientRepository
         await _query.ExecuteAsync(query);
     }
 
-    /// <summary>
-    /// Получение выбранного клиента
-    /// </summary>
-    /// <param name="clientId"></param>
-    /// <returns></returns>
+    
+    /// <inheritdoc />
     public async Task<GetAnyClientDTO> GetClientAsync(int clientId)
     {
         var query = _query.Query(TableName)
@@ -56,11 +50,8 @@ public class ClientRepository : IClientRepository
         return result;
     }
 
-    /// <summary>
-    /// Удаление клиента по id
-    /// </summary>
-    /// <param name="clientId"></param>
-    /// <returns></returns>
+    
+    /// <inheritdoc />
     public async Task<int> DeleteClientAsync(int clientId)
     {
         var query = _query.Query(TableName)
@@ -70,12 +61,8 @@ public class ClientRepository : IClientRepository
         return await _query.ExecuteAsync(query);
     }
 
-    /// <summary>
-    /// Архивирование и разархивирование клиента. При isArchived = true, \n пользователя надо разархивировать, если isArchived = false - архивировать
-    /// </summary>
-    /// <param name="clientId"></param>
-    /// <param name="isArchived"></param>
-    /// <returns></returns>
+    
+    /// <inheritdoc />
     public async Task<int> ArchiveClientAsync(int clientId, bool isArchived)
     {
         var query = _query.Query(TableName)
@@ -90,12 +77,8 @@ public class ClientRepository : IClientRepository
         return await _query.ExecuteAsync(query);
     }
 
-    /// <summary>
-    /// Обновление клиента по id
-    /// </summary>
-    /// <param name="clientId"></param>
-    /// <param name="model"></param>
-    /// <returns></returns>
+    
+    /// <inheritdoc />
     public async Task<int> UpdateClientAsync(int clientId, UpdateClientModel model)
     {
         var query = _query.Query(TableName)
@@ -105,12 +88,8 @@ public class ClientRepository : IClientRepository
         return await _query.ExecuteAsync(query);
     }
 
-    /// <summary>
-    /// Получение списка пользователей с пагинацией, сортировкой и поиском
-    /// </summary>
-    /// <param name="request"></param>
-    /// <param name="userId"></param>
-    /// <returns></returns>
+    
+    /// <inheritdoc />
     public async Task<IEnumerable<ClientsResponse>> GetAllClientAsync(GetAllClientRequest request, int userId)
     {
         var query = _query.Query("clients as c")

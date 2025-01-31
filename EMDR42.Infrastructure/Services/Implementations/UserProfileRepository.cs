@@ -21,13 +21,8 @@ public class UserProfileRepository : IUserProfileRepository
         _query = connectionManager.PostgresQueryFactory;
     }
 
-    /// <summary>
-    /// Создание записи профиля пользователя
-    /// </summary>
-    /// <param name="model"></param>
-    /// <param name="transaction"></param>
-    /// <param name="query"></param>
-    /// <returns></returns>
+    
+    /// <inheritdoc />
     //todo:
     public async Task CreateUserProfileAsync(UserProfileModel model, NpgsqlTransaction transaction, QueryFactory query)
     {
@@ -37,11 +32,8 @@ public class UserProfileRepository : IUserProfileRepository
         await _query.ExecuteAsync(q, transaction);
     }
 
-    /// <summary>
-    /// Получение данных профился пользователя
-    /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
+    
+    /// <inheritdoc />
     public async Task<GetUserProfileDTO> GetUserProfilesAsync(int id)
     {
         var query = _query.Query(TableName)
@@ -59,11 +51,8 @@ public class UserProfileRepository : IUserProfileRepository
         return result;
     }
 
-    /// <summary>
-    /// Обновление данных профиля пользователя
-    /// </summary>
-    /// <param name="model"></param>
-    /// <returns></returns>
+    
+    /// <inheritdoc />
     public async Task<int> UpdateUserProfileAsync(UserProfileModel model)
     {
         var query = _query.Query(TableName).Where("user_id", model.UserId).AsUpdate(model);
@@ -71,11 +60,8 @@ public class UserProfileRepository : IUserProfileRepository
         return await _query.ExecuteAsync(query);
     }
 
-    /// <summary>
-    /// Удаление записи профиля пользователя
-    /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
+    
+    /// <inheritdoc />
     public async Task DeleteUserProfileAsync(int id)
     {
         var query = _query.Query(TableName).Where("user_id", id).AsDelete();

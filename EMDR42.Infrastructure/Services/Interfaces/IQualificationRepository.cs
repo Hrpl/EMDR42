@@ -12,8 +12,30 @@ namespace EMDR42.Infrastructure.Services.Interfaces;
 
 public interface IQualificationRepository
 {
+    /// <summary>
+    /// Получение квалификации пользователя
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     public Task<QualificationDTO> GetUserQualificationAsync(int id);
+    /// <summary>
+    /// Создание записи о квалификации пользователя
+    /// </summary>
+    /// <param name="model"></param>
+    /// <param name="transaction"></param>
+    /// <param name="query"></param>
+    /// <returns></returns>
     public Task CreateUserQualificationAsync(QualificationModel model, NpgsqlTransaction transaction, QueryFactory query);
+    /// <summary>
+    /// Обновление данных квалификации пользователя
+    /// </summary>
+    /// <param name="model"></param>
+    /// <returns></returns>
     public Task<int> UpdateUserQualificationAsync(QualificationModel model);
+    /// <summary>
+    /// Удаление записи о квалификации пользователя
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     public Task DeleteUserQualificationAsync(int id);
 }
