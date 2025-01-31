@@ -18,18 +18,30 @@ public class UserRepository : IUserRepository
         _cryptographyService = cryptographyService;
     }
 
+    /// <summary>
+    /// Проверка наличия пользователя по email
+    /// </summary>
+    /// <param name="login"></param>
+    /// <returns></returns>
     public async Task<bool> CheckedUserByLoginAsync(string login)
     {
         var query = _query.Query(TableName)
             .Where("email", login)
-            .Select("email");
+            .Select("email as Email");
 
         var result = await _query.FirstOrDefaultAsync<string>(query);
 
         if (result != null) return true;
         else return false;
     }
-
+    /// <summary>
+    /// Создание нового пользователя в системе
+    /// </summary>
+    /// <param name="model"></param>
+    /// <param name="transaction"></param>
+    /// <param name="query"></param>
+    /// <returns></returns>
+    //todo:
     public async Task CreatedUserAsync(UserModel model, NpgsqlTransaction transaction, QueryFactory query)
     {
         string salt = _cryptographyService.GenerateSalt();
@@ -42,6 +54,11 @@ public class UserRepository : IUserRepository
         await _query.ExecuteAsync(q, transaction);
     }
 
+    /// <summary>
+    /// Удаление пользователя по email
+    /// </summary>
+    /// <param name="login"></param>
+    /// <returns></returns>
     public async Task DeleteUserAsync(string login)
     {
         var query = _query.Query(TableName).Where("email", login).AsDelete();
@@ -49,38 +66,53 @@ public class UserRepository : IUserRepository
         await _query.ExecuteAsync(query);
     }
 
+    /// <summary>
+    /// Получение данных о пользователи по его email
+    /// </summary>
+    /// <param name="login"></param>
+    /// <returns></returns>
     public Task<UserModel> GetUserAsync(string login)
     {
         var query = _query.Query(TableName)
             .Where("email", login)
-            .Select("email",
-            "password",
-            "salt",
-            "is_confirmed",
-            "created_at",
-            "updated_at",
-            "is_deleted");
+            .Select("email as Email",
+            "password as Password",
+            "salt as Salt",
+            "is_confirmed as IsConfirmed",
+            "created_at as CreatedAt",
+            "updated_at as UpdatedAt",
+            "is_deleted as IsDeleted");
 
         var result = _query.FirstOrDefaultAsync<UserModel>(query);
         return result;
     }
 
+    /// <summary>
+    /// Получение id пользователя по его email
+    /// </summary>
+    /// <param name="login"></param>
+    /// <returns></returns>
     public async Task<int> GetUserIdAsync(string login)
     {
         var query = _query.Query(TableName)
             .Where("email", login)
-            .Select("id");
+            .Select("id as Id");
 
         var result = await _query.FirstAsync<int>(query);
         return result;
     }
 
+    /// <summary>
+    /// Авторизация пользователя
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
     public async Task<bool> LoginUserAsync(LoginRequest request)
     {
         var query = _query.Query(TableName)
             .Where("email", request.Email)
-            .Select("password",
-            "salt");
+            .Select("password as Password",
+            "salt as Salt");
 
         if(query == null) return false;
         var result = await _query.FirstOrDefaultAsync<CheckPasswordModel>(query);
@@ -91,11 +123,16 @@ public class UserRepository : IUserRepository
         else return false;
     }
 
+    /// <summary>
+    /// Подтверждение электронной почты пользователя
+    /// </summary>
+    /// <param name="login"></param>
+    /// <returns></returns>
     public async Task<int> UserConfirmAsync(string login)
     {
         var query = _query.Query(TableName).Where("email", login).AsUpdate(new
         {
-            IsConfirmed = true
+            is_confirmed = true
         });
 
         return await _query.ExecuteAsync(query);

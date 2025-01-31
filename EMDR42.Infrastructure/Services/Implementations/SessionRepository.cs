@@ -16,6 +16,12 @@ public class SessionRepository : ISessionRepository
         _query = dbConnection.PostgresQueryFactory ?? throw new ArgumentNullException(nameof(dbConnection));
         _logger = logger;
     }
+
+    /// <summary>
+    /// Создание записи о сессии
+    /// </summary>
+    /// <param name="model"></param>
+    /// <returns></returns>
     public async Task<int> CreateSessionAsync(SessionModel model)
     {
         ArgumentNullException.ThrowIfNull(model);
@@ -31,7 +37,11 @@ public class SessionRepository : ISessionRepository
             throw; 
         }
     }
-
+    /// <summary>
+    /// Получение логов сессии
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
     public async Task<IEnumerable<SessionLogResponse>> GetSessionLogs(GetSessionLogs request)
     {
         ArgumentNullException.ThrowIfNull(request);
@@ -42,8 +52,8 @@ public class SessionRepository : ISessionRepository
                 .Where("created_at", ">", request.Start)
                 .Where("created_at", "<", request.End)
                 .Where("client_id", request.ClientId)
-                .Select("created_at",
-                "duration");
+                .Select("created_at as CreatedAt",
+                "duration as Duration");
 
             var result = await _query.GetAsync<SessionLogResponse>(query);
             return result;
