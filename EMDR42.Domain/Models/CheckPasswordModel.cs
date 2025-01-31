@@ -8,6 +8,8 @@ namespace EMDR42.Domain.Models;
 
 public class CheckPasswordModel
 {
+    [SqlKata.Column("password")]
     public string Password { get; set; }
+    [SqlKata.Column("salt")]
     public string Salt { get; set; }
 }

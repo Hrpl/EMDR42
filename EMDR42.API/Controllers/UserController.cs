@@ -162,7 +162,7 @@ public class UserController : ControllerBase
                 catch (Exception ex)
                 {
                     await transaction.RollbackAsync();
-                    _logger.LogError("Ошибка при создании пользователя");
+                    _logger.LogError($"Ошибка при создании пользователя: \n {ex.Message} \n {ex.StackTrace}");
                     return StatusCode(500, new ProblemDetails
                     {
                         Title = "Internal server error",
