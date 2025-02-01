@@ -11,6 +11,6 @@ public class ClientsResponse
     public string Email { get; set; }
     public string UserName { get; set; }
     public string? Country { get; set; }
-    public int Sessions { get; set; }
-    public DateTime? LastSession { get; set; }
+    public int Sessions { get; set; } = 0;
+    public DateTime? LastSession { get; set; } = DateTime.MinValue;
 }

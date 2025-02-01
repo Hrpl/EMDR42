@@ -41,11 +41,9 @@ public class UserRepository : IUserRepository
         model.Salt = salt;
 
         var query = _query.Query(TableName).AsInsert(model);
-        await _query.ExecuteAsync(query);
-        return 1;
-           
+        
+        return await _query.ExecuteAsync(query);
     }
-
     
     /// <inheritdoc />
     public async Task DeleteUserAsync(string login)
@@ -54,7 +52,6 @@ public class UserRepository : IUserRepository
 
         await _query.ExecuteAsync(query);
     }
-
     
     /// <inheritdoc />
     public Task<UserModel> GetUserAsync(string login)
@@ -72,7 +69,6 @@ public class UserRepository : IUserRepository
         var result = _query.FirstOrDefaultAsync<UserModel>(query);
         return result;
     }
-
     
     /// <inheritdoc />
     public async Task<int> GetUserIdAsync(string login)
@@ -85,7 +81,6 @@ public class UserRepository : IUserRepository
         return result;
     }
 
-    
     /// <inheritdoc />
     public async Task<bool> LoginUserAsync(LoginRequest request)
     {
@@ -102,7 +97,6 @@ public class UserRepository : IUserRepository
         if (hash == result.Password) return true;
         else return false;
     }
-
     
     /// <inheritdoc />
     public async Task<int> UserConfirmAsync(string login)

@@ -1,5 +1,6 @@
 ﻿using EMDR42.Domain.Commons.DTO;
 using EMDR42.Domain.Commons.Request;
+using EMDR42.Domain.Commons.Response;
 using EMDR42.Domain.Models;
 using EMDR42.Infrastructure.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -31,8 +32,9 @@ public class ClientController : ControllerBase
     /// </summary>
     /// <returns></returns>
     [HttpGet]
-    [SwaggerOperation(Summary = "Получение списка клиентов. Необходим JWT")]
-    public async Task<ActionResult<IEnumerable<ClientDTO>>> Get([FromQuery] GetAllClientRequest request)
+    [SwaggerOperation(Summary = "Получение списка клиентов. Необходим JWT", 
+        Description = "Если IsArchived = false - возвращаются только не архивированные, иначе возвращаются все")]
+    public async Task<ActionResult<IEnumerable<ClientsResponse>>> Get([FromQuery] GetAllClientRequest request)
     {
         try
         {
@@ -46,7 +48,6 @@ public class ClientController : ControllerBase
                     Detail = "Invalid user ID in token."
                 });
             }
-
 
             var response = await _clientService.GetAllClientAsync(request, Convert.ToInt32(userId));
             return Ok(response);
@@ -156,11 +157,11 @@ public class ClientController : ControllerBase
     /// <param name="clientId"></param>
     /// <param name="request"></param>
     /// <returns></returns>
-    [HttpPut("{id}")]
+    [HttpPut("{clientId}")]
     [SwaggerOperation(Summary = "Обновление данных клиента. Необходим JWT")]
     public async Task<ActionResult> Put(int clientId, [FromBody] UpdateClientDTO request)
     {
-        if (clientId > 0 || request == null)
+        if (clientId <= 0 || request == null)
         {
             return BadRequest("Invalid request data.");
         }
@@ -204,7 +205,7 @@ public class ClientController : ControllerBase
         "если isArchived = false, пользователя надо архивировать")]
     public async Task<ActionResult> Archive(int clientId, bool isArchived)
     {
-        if (clientId > 0)
+        if (clientId <= 0)
         {
             return BadRequest("Invalid request data.");
         }

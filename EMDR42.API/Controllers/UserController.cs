@@ -60,6 +60,14 @@ public class UserController : ControllerBase
             if (id > 0)
             {
                 _logger.LogInformation("Пользователь прошёл проверку");
+
+                var resUserProfile = await _profileService.CreateUserProfileAsync(new UserProfileModel { UserId = id });
+                if (resUserProfile != 1) throw new Exception("Ошибка создания профиля пользователя");
+                var resUserContact = await _contactService.CreateUserContactsAsync(new ContactsModel { UserId = id, ContactEmail = email });
+                if (resUserContact != 1) throw new Exception("Ошибка создания контактов пользователя");
+                var resUserQualification = await _qualificationService.CreateUserQualificationAsync(new QualificationModel { UserId = id });
+                if (resUserQualification != 1) throw new Exception("Ошибка создания данных квалификации пользовтеля");
+
                 var result = await _userService.UserConfirmAsync(email);
 
                 if (result != 1)
@@ -71,15 +79,6 @@ public class UserController : ControllerBase
                         Detail = "Произошла ошибка при подтверждении пользователя"
                     });
                 }
-
-
-                var resUserProfile = await _profileService.CreateUserProfileAsync(new UserProfileModel { UserId = id });
-                if (resUserProfile == 1) throw new Exception();
-                var resUserContact = await _contactService.CreateUserContactsAsync(new ContactsModel { UserId = id, ContactEmail = email });
-                if (resUserContact == 1) throw new Exception();
-                var resUserQualification = await _qualificationService.CreateUserQualificationAsync(new QualificationModel { UserId = id });
-                if (resUserQualification == 1) throw new Exception();
-
 
                 string htmlContent = ResponseTemplate.ConfirmResponse;
                 return Content(htmlContent, "text/html");
@@ -117,7 +116,7 @@ public class UserController : ControllerBase
     [SwaggerOperation(Summary = "Создание нового пользователя в системе")]
     public async Task<ActionResult> Create([FromBody] LoginRequest req)
     {
-        if (req.Email == "")
+        if (string.IsNullOrEmpty(req.Email))
         {
             _logger.LogError("Поле Email не заполнено");
             return BadRequest(new ProblemDetails
@@ -143,9 +142,8 @@ public class UserController : ControllerBase
 
         try
         {
-
             var resUser = await _userService.CreatedUserAsync(user);
-            if (resUser == 1) throw new Exception();
+            if (resUser != 1) throw new Exception("Ошибка создания пользователя");
 
             var person = new SendEmailDto() { Email = req.Email, Name = "", Subject = "Confirm email", MessageBody = EmailTemplates.RegistrationEmailTemplate.Replace("@email", req.Email) };
             _logger.LogInformation("Начало отправки сообщения пользователю");
@@ -160,7 +158,7 @@ public class UserController : ControllerBase
             return StatusCode(500, new ProblemDetails
             {
                 Title = "Internal server error",
-                Detail = $"Произошла ошибка при обработке запроса. \n {ex.Message}"
+                Detail = $"Произошла ошибка при обработке запроса. {ex.Message}"
             });
 
         }

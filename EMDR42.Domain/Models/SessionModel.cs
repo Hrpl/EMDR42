@@ -11,7 +11,7 @@ public class SessionModel
     [SqlKata.Column("client_id")]
     public int ClientId { get; set; }
     [SqlKata.Column("duration")]
-    public string? Duration { get; set; }
+    public string? Duration { get; set; } = string.Empty;
     [SqlKata.Column("created_at")]
     public DateTime? CreatedAt { get; set; }
     [SqlKata.Column("updated_at")]

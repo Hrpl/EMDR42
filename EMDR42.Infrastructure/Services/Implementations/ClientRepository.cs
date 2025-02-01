@@ -15,7 +15,7 @@ namespace EMDR42.Infrastructure.Services.Implementations;
 public class ClientRepository : IClientRepository
 {
     private readonly QueryFactory _query;
-    private const string TableName = "сlients";
+    private const string TableName = "clients";
     public ClientRepository(IDbConnectionManager connectionManager)
     {
         _query = connectionManager.PostgresQueryFactory;
@@ -56,7 +56,7 @@ public class ClientRepository : IClientRepository
     {
         var query = _query.Query(TableName)
             .Where("id", clientId)
-            .AsUpdate(new {IsDeleted = true});
+            .AsUpdate(new {is_deleted = true});
 
         return await _query.ExecuteAsync(query);
     }
@@ -82,27 +82,26 @@ public class ClientRepository : IClientRepository
     public async Task<int> UpdateClientAsync(int clientId, UpdateClientModel model)
     {
         var query = _query.Query(TableName)
+            .Where("is_deleted", false)
             .Where("id", clientId)
             .AsUpdate(model);
 
         return await _query.ExecuteAsync(query);
     }
 
-    
     /// <inheritdoc />
     public async Task<IEnumerable<ClientsResponse>> GetAllClientAsync(GetAllClientRequest request, int userId)
     {
-        var query = _query.Query("clients as c")
-            .Join("sessions as s", "s.client_id", "c.id")
-            .Where("c.user_id", userId)
-            .When(!(request.IsArchived), q => q.Where("c.is_archived", true))
-            .When(!(string.IsNullOrEmpty(request.Search)), q => q.WhereRaw($"c.user_name like '{request.Search}' or c.email like '{request.Search}'"))
-            .Select("c.user_name as UserName",
-            "c.country as Country",
-            "c.email as Email")
-            .SelectRaw("COUNT(s.client_id) as Sessions")
-            .SelectRaw("(SELECT MAX(ss.created_at) FROM sessions as ss WHERE ss.client_id = c.id) as LastSession")
-            .GroupBy("c.user_name", "c.country", "c.email", "c.id")
+        var query = _query.Query("clients")
+            .LeftJoin("sessions", "sessions.client_id", "clients.id")
+            .Where("clients.user_id", userId)
+            .Where("clients.is_deleted", false)
+            .When(!(request.IsArchived), q => q.Where("clients.is_archived", false))
+            .When(!(string.IsNullOrEmpty(request.Search)), q => q.WhereRaw($"clients.user_name like '{request.Search}%' or clients.email like '{request.Search}%'"))
+            .Select("clients.user_name as UserName", "clients.country as Country", "clients.email as Email")
+            .SelectRaw("COUNT(clients.user_name) as Sessions")
+            .SelectRaw("(SELECT MAX(sessions.created_at) FROM sessions WHERE sessions.client_id = clients.id) as LastSession")
+            .GroupBy("clients.user_name", "clients.country", "clients.email", "clients.id")
             .Limit(request.PageSize)
             .Offset(request.Skip);
 
