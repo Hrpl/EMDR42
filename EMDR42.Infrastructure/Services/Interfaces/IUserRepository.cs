@@ -1,4 +1,5 @@
-﻿using EMDR42.Domain.Models;
+﻿using EMDR42.Domain.Commons.Request;
+using EMDR42.Domain.Models;
 using Npgsql;
 using SqlKata.Execution;
 
@@ -50,4 +51,22 @@ public interface IUserRepository
     /// <param name="login"></param>
     /// <returns></returns>
     public Task<int> GetUserIdAsync(string login);
+    /// <summary>
+    /// Получение соли по почте пользователя
+    /// </summary>
+    /// <param name="email"></param>
+    /// <returns></returns>
+    public Task<string?> GetSaltByEmail(string email);
+    /// <summary>
+    /// Смена пароля пользователя
+    /// </summary>
+    /// <returns></returns>
+    public Task<int> ChangePasswordAsync(ChangePasswordRequest request);
+    /// <summary>
+    /// Обновление адреса электронной почты
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <param name="newEmail"></param>
+    /// <returns></returns>
+    public Task<int> ChangeEmailAsync(int userId, string newEmail);
 }

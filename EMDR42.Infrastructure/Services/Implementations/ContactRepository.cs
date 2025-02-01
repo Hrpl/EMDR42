@@ -64,4 +64,16 @@ public class ContactRepository : IContactRepository
 
         await _query.ExecuteAsync(query);
     }
+
+    public async Task<int> ChangeEmailAsync(int userId, string newEmail)
+    {
+        var query = _query.Query(TableName)
+            .Where("user_id", userId)
+            .AsUpdate(new
+            {
+                contact_email = newEmail
+            });
+
+        return await _query.ExecuteAsync(query);
+    }
 }

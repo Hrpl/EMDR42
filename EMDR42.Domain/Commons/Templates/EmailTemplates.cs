@@ -12,11 +12,38 @@ public static class EmailTemplates
 <body >
     
     <div >
-        <h3 >Благодарим вас за регистрацию в нашем приложении.</h3>
+        <h3 >Благодарим вас за регистрацию в EMDR42.</h3>
         <br>
         <p >Для завершения процесса регистрации, пожалуйста, перейдите по <span>
             <a href="""">ССЫЛКЕ</a>
         </span> для подтверждения email.</p>
+        
+    </div>
+</body>";
+
+    public const string ChangePasswordEmailTemplate = @"
+<body >
+    
+    <div >
+        <h3 >Смена пароля.</h3>
+        <p >Ключ: @salt</p>
+        <br>
+        <p >Для смены пароля перейдите по <span>
+            <a href="""">ССЫЛКЕ</a>
+        </span> </p>
+        
+    </div>
+</body>";
+
+    public const string ChangeEmailAddressTemplate = @"
+<body >
+    
+    <div >
+        <h3 >Смена почты.</h3>
+        <br>
+        <p >Для смены пароля перейдите по <span>
+            <a href=""/@email/@id?contact=@contact"">ССЫЛКЕ</a>
+        </span> </p>
         
     </div>
 </body>";

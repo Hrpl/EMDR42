@@ -2,6 +2,7 @@
 using EMDR42.Domain.Models;
 using EMDR42.Infrastructure.Services.Interfaces;
 using Npgsql;
+using SqlKata;
 using SqlKata.Execution;
 
 namespace EMDR42.Infrastructure.Services.Implementations;
@@ -18,7 +19,37 @@ public class UserRepository : IUserRepository
         _cryptographyService = cryptographyService;
     }
 
-    
+    /// <inheritdoc />
+    public async Task<int> ChangeEmailAsync(int userId, string newEmail)
+    {
+        var query = _query.Query(TableName)
+            .Where("id", userId)
+            .AsUpdate(new
+            {
+                email = newEmail
+            });
+
+        return await _query.ExecuteAsync(query);
+    }
+
+    /// <inheritdoc />
+    public async Task<int> ChangePasswordAsync(ChangePasswordRequest request)
+    {
+        string newSalt = _cryptographyService.GenerateSalt();
+        string hashedPassword = _cryptographyService.HashPassword(request.NewPassword, newSalt);
+
+        var query = _query.Query(TableName)
+            .Where("email", request.Email)
+            .Where("salt", request.Salt)
+            .AsUpdate(new
+            {
+                salt = newSalt,
+                password = hashedPassword
+            });
+
+        return await _query.ExecuteAsync(query);
+    }
+
     /// <inheritdoc />
     public async Task<bool> CheckedUserByLoginAsync(string login)
     {
@@ -52,7 +83,17 @@ public class UserRepository : IUserRepository
 
         await _query.ExecuteAsync(query);
     }
-    
+
+    /// <inheritdoc />
+    public async Task<string?> GetSaltByEmail(string email)
+    {
+        var query = _query.Query(TableName).Where("email", email).Select("salt");
+
+        var result = await _query.FirstOrDefaultAsync<string?>(query);
+
+        return result;
+    }
+
     /// <inheritdoc />
     public Task<UserModel> GetUserAsync(string login)
     {

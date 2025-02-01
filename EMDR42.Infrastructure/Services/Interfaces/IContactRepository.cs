@@ -38,4 +38,11 @@ public interface IContactRepository
     /// <param name="id"></param>
     /// <returns></returns>
     public Task DeleteUserContactsAsync(int id);
+    /// <summary>
+    /// Обновление контактного адреса почты
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <param name="newEmail"></param>
+    /// <returns></returns>
+    public Task<int> ChangeEmailAsync(int userId, string newEmail);
 }

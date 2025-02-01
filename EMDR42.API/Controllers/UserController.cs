@@ -5,6 +5,7 @@ using EMDR42.Domain.Commons.Templates;
 using EMDR42.Domain.Models;
 using EMDR42.Infrastructure.Services.Interfaces;
 using MapsterMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SqlKata.Compilers;
 using SqlKata.Execution;
@@ -53,11 +54,11 @@ public class UserController : ControllerBase
     [SwaggerOperation(Summary = "Подтверждение почты пользователя")]
     public async Task<ActionResult> Get([FromQuery] string email)
     {
-        try
-        {
-            var id = await _userService.GetUserIdAsync(email);
+        var id = await _userService.GetUserIdAsync(email);
 
-            if (id > 0)
+        if (id > 0)
+        {
+            try
             {
                 _logger.LogInformation("Пользователь прошёл проверку");
 
@@ -83,26 +84,26 @@ public class UserController : ControllerBase
                 string htmlContent = ResponseTemplate.ConfirmResponse;
                 return Content(htmlContent, "text/html");
             }
-            else
+            catch (Exception ex)
             {
-                await _profileService.DeleteUserProfileAsync(id);
-                await _contactService.DeleteUserContactsAsync(id);
-                await _qualificationService.DeleteUserQualificationAsync(id);
-
-                return BadRequest(new ProblemDetails
+                _logger.LogError(ex, "An error occurred while fetching clients.");
+                return StatusCode(500, new ProblemDetails
                 {
-                    Title = "BadRequest",
-                    Detail = "Неверный email адрес!"
+                    Title = "Internal server error",
+                    Detail = $"Произошла ошибка при обработке запроса. \n {ex.Message}"
                 });
             }
         }
-        catch (Exception ex)
+        else
         {
-            _logger.LogError(ex, "An error occurred while fetching clients.");
-            return StatusCode(500, new ProblemDetails
+            await _profileService.DeleteUserProfileAsync(id);
+            await _contactService.DeleteUserContactsAsync(id);
+            await _qualificationService.DeleteUserQualificationAsync(id);
+
+            return BadRequest(new ProblemDetails
             {
-                Title = "Internal server error",
-                Detail = $"Произошла ошибка при обработке запроса. \n {ex.Message}"
+                Title = "BadRequest",
+                Detail = "Неверный email адрес!"
             });
         }
     }
@@ -155,6 +156,235 @@ public class UserController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError($"Ошибка при создании пользователя: \n {ex.Message} \n {ex.StackTrace}");
+            return StatusCode(500, new ProblemDetails
+            {
+                Title = "Internal server error",
+                Detail = $"Произошла ошибка при обработке запроса. {ex.Message}"
+            });
+
+        }
+    }
+
+    /// <summary>
+    /// Отправка письма для смены пароля
+    /// </summary>
+    /// <param name="email"></param>
+    /// <returns></returns>
+    [HttpPost("password/send")]
+    [SwaggerOperation(Summary = "Отправка письма для смены пароля")]
+    public async Task<ActionResult> SendEmailForChangePassword([FromQuery] string email)
+    {
+        if (string.IsNullOrEmpty(email))
+        {
+            _logger.LogError("Email не заполнено");
+            return BadRequest(new ProblemDetails
+            {
+                Title = "BadRequest",
+                Detail = "Email не заполнено"
+            });
+        }
+
+        var findEmail = await _userService.CheckedUserByLoginAsync(email);
+
+        if (!findEmail)
+        {
+            _logger.LogError("Пользователь с таким email не существует");
+            return BadRequest(new ProblemDetails
+            {
+                Title = "BadRequest",
+                Detail = "Пользователь с таким email не существует"
+            });
+        }
+
+        try
+        {
+            //будет ключом для смены пароля
+            var salt = await _userService.GetSaltByEmail(email);
+
+            var person = new SendEmailDto()
+            {
+                Email = email,
+                Name = "",
+                Subject = "Change password",
+                MessageBody = EmailTemplates.ChangePasswordEmailTemplate.Replace("@salt", salt)
+            };
+            _logger.LogInformation("Начало отправки сообщения пользователю");
+            await _emailService.SendEmail(person);
+
+            _logger.LogInformation("Сообщение отправлено пользователю");
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"Произошла ошибка при обработке запроса: \n {ex.Message} \n {ex.StackTrace}");
+            return StatusCode(500, new ProblemDetails
+            {
+                Title = "Internal server error",
+                Detail = $"Произошла ошибка при обработке запроса. {ex.Message}"
+            });
+
+        }
+    }
+
+    /// <summary>
+    /// Смена пароля пользователя
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    [HttpPost("change/password")]
+    [SwaggerOperation(Summary = "Смена пароля пользователя")]
+    public async Task<ActionResult> SendEmailForChangePassword([FromBody] ChangePasswordRequest request)
+    {
+        if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Salt))
+        {
+            _logger.LogError("Данные не заполнены");
+            return BadRequest(new ProblemDetails
+            {
+                Title = "BadRequest",
+                Detail = "Данные не заполнены"
+            });
+        }
+
+        try
+        {
+            var result = await _userService.ChangePasswordAsync(request);
+
+            if (result != 1)
+            {
+                _logger.LogError("Произошла ошибка при смене пароля, возможно ввели неправильные данные");
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "BadRequest",
+                    Detail = "Произошла ошибка при смене пароля, возможно ввели неправильные данные"
+                });
+            }
+
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"Произошла ошибка при обработке запроса: \n {ex.Message} \n {ex.StackTrace}");
+            return StatusCode(500, new ProblemDetails
+            {
+                Title = "Internal server error",
+                Detail = $"Произошла ошибка при обработке запроса. {ex.Message}"
+            });
+
+        }
+    }
+
+    [HttpGet("cange/email/{email}/{id}")]
+    [SwaggerOperation(Summary = "Подтверждение почты пользователя")]
+    public async Task<ActionResult> ChangeEmails([FromRoute] string email, [FromRoute] int id, [FromQuery] int contact)
+    {
+        if (string.IsNullOrEmpty(email) || id < 0)
+        {
+            _logger.LogError("Данные не заполнены");
+            return BadRequest(new ProblemDetails
+            {
+                Title = "BadRequest",
+                Detail = "Данные не заполнены"
+            });
+        }
+
+        try
+        {
+            var result = await _userService.ChangeEmailAsync(id, email);
+
+            if (result != 1)
+            {
+                _logger.LogError($"Произошла ошибка при обновлении адреса электронной почты");
+                return NotFound(new ProblemDetails
+                {
+                    Title = "NotFound",
+                    Detail = "Произошла ошибка при обновлении адреса электронной почты"
+                });
+            }
+
+            if(contact == 1)
+            {
+                result = await _contactService.ChangeEmailAsync(id, email);
+
+                if (result != 1)
+                {
+                    _logger.LogError($"Произошла ошибка при обновлении контактного адреса электронной почты");
+                    return NotFound(new ProblemDetails
+                    {
+                        Title = "NotFound",
+                        Detail = "Произошла ошибка при обновлении контактного адреса электронной почты"
+                    });
+                }
+            }
+
+            return Redirect("");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while fetching clients.");
+            return StatusCode(500, new ProblemDetails
+            {
+                Title = "Internal server error",
+                Detail = $"Произошла ошибка при обработке запроса. \n {ex.Message}"
+            });
+        }
+    }
+
+    /// <summary>
+    /// Отправка письма для смены почты
+    /// </summary>
+    /// <param name="email"></param>
+    /// <returns></returns>
+    [Authorize]
+    [HttpPost("change/email/send")]
+    [SwaggerOperation(Summary = "Отправка письма для смены почты",
+        Description = "Если contact = 1 - email установится как контактный, иначе 0")]
+    public async Task<ActionResult> SendEmailForChangeEmailAddress([FromQuery] string email, [FromQuery] int contact)
+    {
+        var userId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
+
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Unauthorized(new ProblemDetails
+            {
+                Title = "Unauthorized",
+                Detail = "Invalid user ID in token."
+            });
+        }
+
+        if (string.IsNullOrEmpty(email))
+        {
+            _logger.LogError("Поле Email не заполнено");
+            return BadRequest(new ProblemDetails
+            {
+                Title = "BadRequest",
+                Detail = "Поле Email не заполнено"
+            });
+        }
+
+        try
+        {
+            var content = EmailTemplates.ChangeEmailAddressTemplate
+                .Replace("@email", email)
+                .Replace("@id", userId)
+                .Replace("@contact", contact.ToString());
+
+            var person = new SendEmailDto()
+            {
+                Email = email,
+                Name = "",
+                Subject = "Change email",
+                MessageBody = content
+            };
+
+            _logger.LogInformation("Начало отправки сообщения пользователю");
+            await _emailService.SendEmail(person);
+
+            _logger.LogInformation("Сообщение отправлено пользователю");
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"Произошла ошибка при обработке запроса: \n {ex.Message} \n {ex.StackTrace}");
             return StatusCode(500, new ProblemDetails
             {
                 Title = "Internal server error",

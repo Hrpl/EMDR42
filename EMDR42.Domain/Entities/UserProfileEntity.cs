@@ -9,6 +9,7 @@ namespace EMDR42.Domain.Entities;
 public class UserProfileEntity : BaseEntity
 {
     public int UserId { get; set; }
+    public string Photo { get; set; }
     public string? Name { get; set; }
     public string? Surname { get; set; }
     public string? Patronymic { get; set; }

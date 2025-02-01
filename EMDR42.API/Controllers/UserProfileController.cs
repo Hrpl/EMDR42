@@ -9,7 +9,7 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace EMDR42.API.Controllers;
 
-[Route("api/userProfile")]
+[Route("api/profile")]
 [ApiController]
 [Authorize]
 public class UserProfileController : ControllerBase
