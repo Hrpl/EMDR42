@@ -16,6 +16,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<ContactEntity> Contacts { get; set; }
     public DbSet<SessionEntity> Sessions { get; set; }
     public DbSet<ClientEntity> Clients { get; set; }
+    public DbSet<TherapyEntity> Therapies { get; set; }
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     {
         Database.Migrate();
@@ -26,5 +27,4 @@ public class ApplicationDbContext : DbContext
         optionsBuilder.UseSnakeCaseNamingConvention();
         base.OnConfiguring(optionsBuilder);
     }
-
 }

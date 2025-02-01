@@ -98,5 +98,6 @@ public static class AddServiceExtensions
         services.AddScoped<IClientRepository, ClientRepository>();
         services.AddScoped<ISessionRepository, SessionRepository>();
         services.AddScoped<IFindSpecialistRepository, FindSpecialistRepository>();
+        services.AddScoped<ITherapyRepository, TherapyRepository>();
     }
 }
