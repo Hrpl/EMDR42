@@ -17,8 +17,6 @@ public interface IUserProfileRepository
     /// Создание записи профиля пользователя
     /// </summary>
     /// <param name="model"></param>
-    /// <param name="transaction"></param>
-    /// <param name="query"></param>
     /// <returns></returns>
     public Task<int> CreateUserProfileAsync(UserProfileModel model);
     /// <summary>

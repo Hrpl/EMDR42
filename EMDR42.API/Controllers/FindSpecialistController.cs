@@ -35,6 +35,17 @@ public class FindSpecialistController : ControllerBase
         try
         {
             var response = await _findSpecialistRepository.GetSpecialists(request);
+
+            if(response == null)
+            {
+                _logger.LogError("Ошибка при получении списка специалистов");
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Bad Request",
+                    Detail = "Ошибка при получении списка специалистов"
+                });
+            }
+
             return Ok(response);
         }
         catch (Exception ex)

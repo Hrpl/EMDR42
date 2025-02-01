@@ -22,8 +22,6 @@ public interface IContactRepository
     /// Создание части профиля с контактами
     /// </summary>
     /// <param name="model"></param>
-    /// <param name="transaction"></param>
-    /// <param name="query"></param>
     /// <returns></returns>
     public Task<int> CreateUserContactsAsync(ContactsModel model);
     /// <summary>

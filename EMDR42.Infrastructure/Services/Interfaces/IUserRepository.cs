@@ -11,8 +11,6 @@ public interface IUserRepository
     /// Создание нового пользователя в системе
     /// </summary>
     /// <param name="model"></param>
-    /// <param name="transaction"></param>
-    /// <param name="query"></param>
     /// <returns></returns>
     public Task<int> CreatedUserAsync(UserModel model);
     /// <summary>

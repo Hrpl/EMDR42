@@ -20,6 +20,7 @@ public class ContactsModel
     public DateTime? CreatedAt { get; set; } = DateTime.Now;
     [SqlKata.Column("updated_at")]
     public DateTime? UpdatedAt { get; set; } = DateTime.Now;
+
     [SqlKata.Column("is_deleted")]
     public bool IsDeleted { get; set; } = false;
 }

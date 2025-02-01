@@ -4,11 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EMDR42.Domain.Entities;
+namespace EMDR42.Domain.Commons.DTO;
 
-public class TherapyEntity : BaseEntity
+public class TherapyDTO
 {
-    public string UserId { get; set; }
     public string? Methods { get; set; }
     public string? AgePatients { get; set; }
     public string? CategoryPatients { get; set; }

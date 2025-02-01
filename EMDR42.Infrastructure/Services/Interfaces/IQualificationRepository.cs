@@ -22,8 +22,6 @@ public interface IQualificationRepository
     /// Создание записи о квалификации пользователя
     /// </summary>
     /// <param name="model"></param>
-    /// <param name="transaction"></param>
-    /// <param name="query"></param>
     /// <returns></returns>
     public Task<int> CreateUserQualificationAsync(QualificationModel model);
     /// <summary>
