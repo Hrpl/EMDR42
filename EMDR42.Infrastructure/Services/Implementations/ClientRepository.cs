@@ -94,14 +94,15 @@ public class ClientRepository : IClientRepository
     {
         var query = _query.Query("clients as c")
             .Join("sessions as s", "s.client_id", "c.id")
-            .Where("c.UserId", userId)
+            .Where("c.user_id", userId)
             .When(!(request.IsArchived), q => q.Where("c.is_archived", true))
             .When(!(string.IsNullOrEmpty(request.Search)), q => q.WhereRaw($"c.user_name like '{request.Search}' or c.email like '{request.Search}'"))
             .Select("c.user_name as UserName",
             "c.country as Country",
             "c.email as Email")
             .SelectRaw("COUNT(s.client_id) as Sessions")
-            .SelectRaw("(SELECT MAX(created_at) FROM s WHERE s.client_id = c.id) as LastSession")
+            .SelectRaw("(SELECT MAX(ss.created_at) FROM sessions as ss WHERE ss.client_id = c.id) as LastSession")
+            .GroupBy("c.user_name", "c.country", "c.email", "c.id")
             .Limit(request.PageSize)
             .Offset(request.Skip);
 
