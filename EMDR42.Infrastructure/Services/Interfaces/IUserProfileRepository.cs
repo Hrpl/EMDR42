@@ -33,4 +33,16 @@ public interface IUserProfileRepository
     /// <param name="id"></param>
     /// <returns></returns>
     public Task DeleteUserProfileAsync(int id);
+    /// <summary>
+    /// Обновление данных "О себе" в профиле
+    /// </summary>
+    /// <param name="aboutMe"></param>
+    /// <returns></returns>
+    public Task<int> UpdateAboutMeAsync(string aboutMe, int userId);
+    /// <summary>
+    /// Обновление фотографии пользователя
+    /// </summary>
+    /// <param name="photo"></param>
+    /// <returns></returns>
+    public Task<int> UpdatePhotoAsync(string userPhoto, int userId);
 }

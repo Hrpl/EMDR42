@@ -20,7 +20,6 @@ public class ClientRepository : IClientRepository
     {
         _query = connectionManager.PostgresQueryFactory;
     }
-
     
     /// <inheritdoc />
     public async Task CreateClientAsync(ClientModel model)
@@ -31,7 +30,6 @@ public class ClientRepository : IClientRepository
         await _query.ExecuteAsync(query);
     }
 
-    
     /// <inheritdoc />
     public async Task<GetAnyClientDTO> GetClientAsync(int clientId)
     {
@@ -50,7 +48,6 @@ public class ClientRepository : IClientRepository
         return result;
     }
 
-    
     /// <inheritdoc />
     public async Task<int> DeleteClientAsync(int clientId)
     {
@@ -61,7 +58,6 @@ public class ClientRepository : IClientRepository
         return await _query.ExecuteAsync(query);
     }
 
-    
     /// <inheritdoc />
     public async Task<int> ArchiveClientAsync(int clientId, bool isArchived)
     {
@@ -77,7 +73,6 @@ public class ClientRepository : IClientRepository
         return await _query.ExecuteAsync(query);
     }
 
-    
     /// <inheritdoc />
     public async Task<int> UpdateClientAsync(int clientId, UpdateClientModel model)
     {

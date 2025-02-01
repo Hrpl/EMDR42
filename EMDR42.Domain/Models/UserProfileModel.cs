@@ -10,8 +10,8 @@ public class UserProfileModel
     public string? Surname { get; set; }
     [SqlKata.Column("patronymic")]
     public string? Patronymic { get; set; }
-    [SqlKata.Column("photo")]
-    public string Photo { get; set; } = "";
+    [SqlKata.Column("clinic_name")]
+    public string? ClinicName { get; set; }
     [SqlKata.Column("gender")]
     public string? Gender { get; set; }
     [SqlKata.Column("birthday")]

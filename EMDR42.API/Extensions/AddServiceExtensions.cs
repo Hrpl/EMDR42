@@ -97,5 +97,6 @@ public static class AddServiceExtensions
         services.AddScoped<ICryptographyService, CryptographyService>();
         services.AddScoped<IClientRepository, ClientRepository>();
         services.AddScoped<ISessionRepository, SessionRepository>();
+        services.AddScoped<IFindSpecialistRepository, FindSpecialistRepository>();
     }
 }

@@ -12,6 +12,9 @@ public class GetUserProfileDTO
     public string Surname { get; set; }
     public string Patronymic { get; set; }
     public string Gender { get; set; }
+    public string Photo { get; set; }
+    public string AboutMe { get; set; }
+    public string ClinicName { get; set; }
     public DateOnly Birthday { get; set; }
     public string Address { get; set; }
     public bool IsPublic { get; set; }

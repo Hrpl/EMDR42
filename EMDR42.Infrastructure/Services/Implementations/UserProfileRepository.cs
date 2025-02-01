@@ -21,7 +21,6 @@ public class UserProfileRepository : IUserProfileRepository
         _query = connectionManager.PostgresQueryFactory;
     }
 
-    
     /// <inheritdoc />
     public async Task<int> CreateUserProfileAsync(UserProfileModel model)
     {
@@ -31,7 +30,6 @@ public class UserProfileRepository : IUserProfileRepository
         return await _query.ExecuteAsync(query);
     }
 
-    
     /// <inheritdoc />
     public async Task<GetUserProfileDTO> GetUserProfilesAsync(int id)
     {
@@ -40,6 +38,9 @@ public class UserProfileRepository : IUserProfileRepository
             .Select("name as Name",
             "surname as Surname",
             "patronymic as Patronymic",
+            "clinic_name as ClinicName",
+            "about_me as AboutMe",
+            "photo as Photo",
             "gender as Gender",
             "birthday as Birthday",
             "address as Address",
@@ -50,7 +51,6 @@ public class UserProfileRepository : IUserProfileRepository
         return result;
     }
 
-    
     /// <inheritdoc />
     public async Task<int> UpdateUserProfileAsync(UserProfileModel model)
     {
@@ -59,12 +59,37 @@ public class UserProfileRepository : IUserProfileRepository
         return await _query.ExecuteAsync(query);
     }
 
-    
     /// <inheritdoc />
     public async Task DeleteUserProfileAsync(int id)
     {
         var query = _query.Query(TableName).Where("user_id", id).AsDelete();
 
         await _query.ExecuteAsync(query);
+    }
+
+    /// <inheritdoc />
+    public async Task<int> UpdateAboutMeAsync(string aboutMe, int userId)
+    {
+        var query = _query.Query(TableName)
+            .Where("user_id", userId)
+            .AsUpdate(new
+            {
+                about_me = aboutMe
+            });
+
+        return await _query.ExecuteAsync(query);
+    }
+
+    /// <inheritdoc />
+    public async Task<int> UpdatePhotoAsync(string userPhoto, int userId)
+    {
+        var query = _query.Query(TableName)
+            .Where("user_id", userId)
+            .AsUpdate(new
+            {
+                photo = userPhoto
+            });
+
+        return await _query.ExecuteAsync(query);
     }
 }
