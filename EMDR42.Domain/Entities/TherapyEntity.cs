@@ -8,7 +8,7 @@ namespace EMDR42.Domain.Entities;
 
 public class TherapyEntity : BaseEntity
 {
-    public string UserId { get; set; }
+    public int UserId { get; set; }
     public string? Methods { get; set; }
     public string? AgePatients { get; set; }
     public string? CategoryPatients { get; set; }

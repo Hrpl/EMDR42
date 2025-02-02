@@ -9,7 +9,7 @@ namespace EMDR42.Domain.Models;
 public class TherapyModel
 {
     [SqlKata.Column("user_id")]
-    public string UserId { get; set; }
+    public int UserId { get; set; }
     [SqlKata.Column("methods")]
     public string? Methods { get; set; }
     [SqlKata.Column("age_patients")]
