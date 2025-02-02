@@ -1,0 +1,55 @@
+version: '3.8'
+
+networks:
+  network:
+   driver: bridge
+
+volumes:
+  postgres_data:
+  postgres_data2:
+
+services:
+
+  nginx:
+    container_name: nginx
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    restart: always
+    ports:
+      - "444:444"
+    networks:
+      - network
+    depends_on:
+      - api
+
+  api:
+    build:
+      context: .
+      dockerfile: EMDR42.API/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=5010
+    ports:
+      - '5010:5010'
+    depends_on:
+      - db
+    networks:
+      - network
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+
+  db:
+    image: postgres:latest
+    container_name: db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 2208
+      POSTGRES_DB: EMDR
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - network
