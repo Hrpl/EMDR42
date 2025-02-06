@@ -17,7 +17,7 @@ services:
       dockerfile: ./Dockerfile
     restart: always
     ports:
-      - "444:444"
+      - "443:443"
     networks:
       - network
     depends_on:
