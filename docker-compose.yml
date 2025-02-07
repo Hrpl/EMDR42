@@ -2,11 +2,10 @@ version: '3.8'
 
 networks:
   network:
-   driver: bridge
+    driver: bridge
 
 volumes:
   postgres_data:
-  postgres_data2:
   certs:
 
 services:
@@ -29,10 +28,10 @@ services:
          - certs:/etc/letsencrypt
 
   certbot:
-       image: certbot/certbot
-       volumes:
-         - certs:/etc/letsencrypt
-         - ./www:/var/www/certbot
+    image: certbot/certbot
+    volumes:
+      - certs:/etc/letsencrypt
+      - ./www:/var/www/certbot
 
   api:
     build:

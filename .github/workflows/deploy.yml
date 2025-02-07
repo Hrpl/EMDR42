@@ -22,7 +22,7 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            rm -rf /home/root/EMDR42
+            rm -rf /home/root/EMDR42W
 
 
       # Установка соединения с VPS и деплой
