@@ -22,7 +22,7 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            rm -rf /home/root/EMDR42W
+            rm -rf /root/EMDR42W
 
 
       # Установка соединения с VPS и деплой
@@ -35,11 +35,11 @@ jobs:
           passphrase: "" # Укажите, если ключ защищён паролем
           script: |
             # Обновление или клонирование репозитория
-            git clone https://github.com/Hrpl/EMDR42.git /home/root/EMDR42
+            git clone https://github.com/Hrpl/EMDR42.git /root/EMDR42
             
 
             # Перемещение в директорию проекта
-            cd /home/root/EMDR42
+            cd /root/EMDR42
             docker-compose down
             docker-compose pull
             docker-compose up -d --build

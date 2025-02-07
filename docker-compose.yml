@@ -22,6 +22,7 @@ services:
     networks:
       - network
     depends_on:
+      - api
 
   certbot:
     image: certbot/certbot
