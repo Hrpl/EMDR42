@@ -10,7 +10,7 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace EMDR42.API.Controllers;
 
-[Route("api/qualification")]
+[Route("qualification")]
 [ApiController]
 [Authorize]
 public class QualificationController : ControllerBase
@@ -46,7 +46,7 @@ public class QualificationController : ControllerBase
 
         try
         {
-            var response = await _qualificationService.GetUserQualificationAsync(Convert.ToInt32(userId));
+            var response = await _qualificationService.GetAsync(Convert.ToInt32(userId));
 
             if (response == null)
             {
@@ -93,7 +93,7 @@ public class QualificationController : ControllerBase
             var model = _mapper.Map<QualificationModel>(request);
             model.UserId = Convert.ToInt32(userId);
 
-            var result = await _qualificationService.UpdateUserQualificationAsync(model);
+            var result = await _qualificationService.UpdateAsync(model);
             if (result != 1)
             {
                 _logger.LogError($"Произошла ошибка при обновлении данных о квалификации пользователя");

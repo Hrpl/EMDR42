@@ -9,22 +9,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace EMDR42.Infrastructure.Services.Implementations;
 
-public class ContactRepository : IContactRepository
+public class ContactRepository(IDbConnectionManager dbConnectionManager) : IContactRepository
 {
-    private readonly QueryFactory _query;
+    private readonly QueryFactory _query = dbConnectionManager.PostgresQueryFactory;
     private const string TableName = "contacts";
-    public ContactRepository(IDbConnectionManager dbConnectionManager)
-    {
-        _query = dbConnectionManager.PostgresQueryFactory;
-    }
 
-    
-    /// <inheritdoc />
-    public async Task<int> CreateUserContactsAsync(ContactsModel model)
+
+    /// <summary>
+    /// Создание части профиля с контактами
+    /// </summary>
+    /// <param name="model"></param>
+    /// <returns></returns>
+    public async Task<int> CreateAsync(ContactsModel model)
     {
         var q = _query.Query(TableName)
             .AsInsert(model);
@@ -32,9 +31,12 @@ public class ContactRepository : IContactRepository
         return await _query.ExecuteAsync(q);
     }
 
-    
-    /// <inheritdoc />
-    public async Task<ContactsDTO> GetUserContactsAsync(int id)
+    /// <summary>
+    /// Получение контактов пользователя
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    public async Task<ContactsDTO> GetAsync(int id)
     {
         var query = _query.Query(TableName)
             .Where("user_id", id)
@@ -47,18 +49,26 @@ public class ContactRepository : IContactRepository
         return result;
     }
 
-    
-    /// <inheritdoc />
-    public async Task<int> UpdateUserContactsAsync(ContactsModel model)
+
+    /// <summary>
+    /// Обновление контактов пользователя
+    /// </summary>
+    /// <param name="model"></param>
+    /// <returns></returns>
+    public async Task<int> UpdateAsync(ContactsModel model)
     {
         var query = _query.Query(TableName).Where("user_id", model.UserId).AsUpdate(model);
 
         return await _query.ExecuteAsync(query);
     }
 
-    
-    /// <inheritdoc />
-    public async Task DeleteUserContactsAsync(int id)
+
+    /// <summary>
+    /// Удаление записи о контактах пользователя
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    public async Task DeleteAsync(int id)
     {
         var query = _query.Query(TableName).Where("user_id", id).AsDelete();
 

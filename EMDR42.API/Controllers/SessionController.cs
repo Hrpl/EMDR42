@@ -10,7 +10,7 @@ using System.Data.Common;
 
 namespace EMDR42.API.Controllers;
 
-[Route("api/session")]
+[Route("session")]
 [ApiController]
 [Authorize]
 public class SessionController : ControllerBase

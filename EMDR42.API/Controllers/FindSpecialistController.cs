@@ -10,7 +10,7 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace EMDR42.API.Controllers;
 
-[Route("api/specialist")]
+[Route("specialist")]
 [ApiController]
 public class FindSpecialistController : ControllerBase
 {

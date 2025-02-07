@@ -11,7 +11,7 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace EMDR42.API.Controllers;
 
-[Route("api/client")]
+[Route("client")]
 [ApiController]
 [Authorize]
 public class ClientController : ControllerBase

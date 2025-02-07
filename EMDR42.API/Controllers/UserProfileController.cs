@@ -11,7 +11,7 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace EMDR42.API.Controllers;
 
-[Route("api/profile")]
+[Route("profile")]
 [ApiController]
 [Authorize]
 public class UserProfileController : ControllerBase
@@ -47,7 +47,7 @@ public class UserProfileController : ControllerBase
                 });
             }
 
-            var response = await _userProfileService.GetUserProfilesAsync(Convert.ToInt32(userId));
+            var response = await _userProfileService.GetAsync(Convert.ToInt32(userId));
 
             if (response == null)
             {
@@ -207,7 +207,7 @@ public class UserProfileController : ControllerBase
             var model = _mapper.Map<UserProfileModel>(request);
             model.UserId = Convert.ToInt32(userId);
 
-            var result = await _userProfileService.UpdateUserProfileAsync(model);
+            var result = await _userProfileService.UpdateAsync(model);
             if (result != 1)
             {
                 _logger.LogError($"Произошла ошибка при обновлении контактов пользователя");

@@ -14,17 +14,17 @@ using System.Threading.Tasks;
 
 namespace EMDR42.Infrastructure.Services.Implementations;
 
-public class QualificationRepository : IQualificationRepository
+public class QualificationRepository(IDbConnectionManager dbConnection) : IQualificationRepository
 {
-    private readonly QueryFactory _query;
+    private readonly QueryFactory _query = dbConnection.PostgresQueryFactory;
     private const string TableName = "qualifications";
-    public QualificationRepository(IDbConnectionManager dbConnection)
-    {
-        _query = dbConnection.PostgresQueryFactory;
-    }
-    
-    /// <inheritdoc />
-    public async Task<int> CreateUserQualificationAsync(QualificationModel model)
+
+    /// <summary>
+    /// Создание записи о квалификации пользователя
+    /// </summary>
+    /// <param name="model"></param>
+    /// <returns></returns>
+    public async Task<int> CreateAsync(QualificationModel model)
     {
         var query = _query.Query(TableName)
             .AsInsert(model);
@@ -32,9 +32,13 @@ public class QualificationRepository : IQualificationRepository
         return await _query.ExecuteAsync(query);
     }
 
-    
-    /// <inheritdoc />
-    public async Task<QualificationDTO> GetUserQualificationAsync(int id)
+
+    /// <summary>
+    /// Получение квалификации пользователя
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    public async Task<QualificationDTO> GetAsync(int id)
     {
         var query = _query.Query(TableName)
             .Where("user_id", id)
@@ -47,18 +51,26 @@ public class QualificationRepository : IQualificationRepository
         return result;
     }
 
-    
-    /// <inheritdoc />
-    public async Task<int> UpdateUserQualificationAsync(QualificationModel model)
+
+    /// <summary>
+    /// Обновление данных квалификации пользователя
+    /// </summary>
+    /// <param name="model"></param>
+    /// <returns></returns>
+    public async Task<int> UpdateAsync(QualificationModel model)
     {
         var query = _query.Query(TableName).Where("user_id", model.UserId).AsUpdate(model);
 
         return await _query.ExecuteAsync(query);
     }
 
-    
-    /// <inheritdoc />
-    public async Task DeleteUserQualificationAsync(int id)
+
+    /// <summary>
+    /// Удаление записи о квалификации пользователя
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    public async Task DeleteAsync(int id)
     {
         var query = _query.Query(TableName).Where("user_id", id).AsDelete();
 

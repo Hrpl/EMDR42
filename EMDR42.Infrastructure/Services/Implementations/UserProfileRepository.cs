@@ -21,8 +21,12 @@ public class UserProfileRepository : IUserProfileRepository
         _query = connectionManager.PostgresQueryFactory;
     }
 
-    /// <inheritdoc />
-    public async Task<int> CreateUserProfileAsync(UserProfileModel model)
+    /// <summary>
+    /// Создание записи профиля пользователя
+    /// </summary>
+    /// <param name="model"></param>
+    /// <returns></returns>
+    public async Task<int> CreateAsync(UserProfileModel model)
     {
         var query = _query.Query(TableName)
             .AsInsert(model);
@@ -30,8 +34,13 @@ public class UserProfileRepository : IUserProfileRepository
         return await _query.ExecuteAsync(query);
     }
 
-    /// <inheritdoc />
-    public async Task<GetUserProfileDTO> GetUserProfilesAsync(int id)
+
+    /// <summary>
+    /// Получение данных профиля пользователя
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    public async Task<GetUserProfileDTO> GetAsync(int id)
     {
         var query = _query.Query(TableName)
             .Where("user_id", id)
@@ -51,23 +60,31 @@ public class UserProfileRepository : IUserProfileRepository
         return result;
     }
 
-    /// <inheritdoc />
-    public async Task<int> UpdateUserProfileAsync(UserProfileModel model)
+
+    /// <summary>
+    /// Обновление данных профиля пользователя
+    /// </summary>
+    /// <param name="model"></param>
+    /// <returns></returns>
+    public async Task<int> UpdateAsync(UserProfileModel model)
     {
         var query = _query.Query(TableName).Where("user_id", model.UserId).AsUpdate(model);
 
         return await _query.ExecuteAsync(query);
     }
 
-    /// <inheritdoc />
-    public async Task DeleteUserProfileAsync(int id)
+    /// <summary>
+    /// Удаление записи профиля пользователя
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    public async Task DeleteAsync(int id)
     {
         var query = _query.Query(TableName).Where("user_id", id).AsDelete();
 
         await _query.ExecuteAsync(query);
     }
 
-    /// <inheritdoc />
     public async Task<int> UpdateAboutMeAsync(string aboutMe, int userId)
     {
         var query = _query.Query(TableName)

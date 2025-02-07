@@ -5,34 +5,41 @@ using SqlKata.Execution;
 
 namespace EMDR42.Infrastructure.Services.Implementations;
 
-public class TherapyRepository : ITherapyRepository
+public class TherapyRepository(IDbConnectionManager connectionManager) : ITherapyRepository
 {
-    private readonly QueryFactory _query;
+    private readonly QueryFactory _query = connectionManager.PostgresQueryFactory;
     private const string TableName = "therapies";
-    public TherapyRepository(IDbConnectionManager connectionManager)
-    {
-        _query = connectionManager.PostgresQueryFactory;
-    }
 
-    /// <inheritdoc />
-    public async Task<int> CreateUserQualificationAsync(TherapyModel model)
+    /// <summary>
+    /// Создание записи о методах лечения
+    /// </summary>
+    /// <param name="model"></param>
+    /// <returns></returns>
+    public async Task<int> CreateAsync(TherapyModel model)
     {
         var query = _query.Query(TableName)
             .AsInsert(model);
 
         return await _query.ExecuteAsync(query);
     }
-
-    /// <inheritdoc />
-    public async Task DeleteUserQualificationAsync(int id)
+    /// <summary>
+    /// Удаление записи о методах лечении
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    public async Task DeleteAsync(int id)
     {
         var query = _query.Query(TableName).Where("user_id", id).AsDelete();
 
         await _query.ExecuteAsync(query);
     }
 
-    /// <inheritdoc />
-    public async Task<TherapyDTO> GetUserTherapyAsync(int id)
+    /// <summary>
+    /// Получение данных о методах лечении
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    public async Task<TherapyDTO> GetAsync(int id)
     {
         var query = _query.Query(TableName)
             .Where("user_id", id)
@@ -48,8 +55,12 @@ public class TherapyRepository : ITherapyRepository
         return result;
     }
 
-    /// <inheritdoc />
-    public async Task<int> UpdateUserQualificationAsync(TherapyModel model)
+    //// <summary>
+    /// Обновление данных о методах лечении
+    /// </summary>
+    /// <param name="model"></param>
+    /// <returns></returns>
+    public async Task<int> UpdateAsync(TherapyModel model)
     {
         var query = _query.Query(TableName).Where("user_id", model.UserId).AsUpdate(model);
 

@@ -15,7 +15,8 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace EMDR42.API.Controllers;
 
-[Route("api/[controller]")]
+//todo: вынести методы по отправке сообщений в другой контроллер
+[Route("user")]
 [ApiController]
 public class UserController : ControllerBase
 {
@@ -26,6 +27,7 @@ public class UserController : ControllerBase
     private readonly IUserProfileRepository _profileService;
     private readonly IContactRepository _contactService;
     private readonly IQualificationRepository _qualificationService;
+    private readonly ITherapyRepository _therapyRepository;
 
     public UserController(
         IEmailService emailService,
@@ -34,7 +36,8 @@ public class UserController : ControllerBase
         ILogger<UserController> logger,
         IUserProfileRepository profileService,
         IContactRepository contactService,
-        IQualificationRepository qualificationService)
+        IQualificationRepository qualificationService,
+        ITherapyRepository therapyRepository)
     {
         _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
         _userService = userService ?? throw new ArgumentNullException(nameof(userService));
@@ -43,6 +46,7 @@ public class UserController : ControllerBase
         _profileService = profileService ?? throw new ArgumentNullException(nameof(profileService));
         _contactService = contactService ?? throw new ArgumentNullException(nameof(contactService));
         _qualificationService = qualificationService ?? throw new ArgumentNullException(nameof(qualificationService));
+        _therapyRepository = therapyRepository ?? throw new ArgumentNullException(nameof(therapyRepository));
     }
 
     /// <summary>
@@ -62,12 +66,14 @@ public class UserController : ControllerBase
             {
                 _logger.LogInformation("Пользователь прошёл проверку");
 
-                var resUserProfile = await _profileService.CreateUserProfileAsync(new UserProfileModel { UserId = id });
+                var resUserProfile = await _profileService.CreateAsync(new UserProfileModel { UserId = id });
                 if (resUserProfile != 1) throw new Exception("Ошибка создания профиля пользователя");
-                var resUserContact = await _contactService.CreateUserContactsAsync(new ContactsModel { UserId = id, ContactEmail = email });
+                var resUserContact = await _contactService.CreateAsync(new ContactsModel { UserId = id, ContactEmail = email });
                 if (resUserContact != 1) throw new Exception("Ошибка создания контактов пользователя");
-                var resUserQualification = await _qualificationService.CreateUserQualificationAsync(new QualificationModel { UserId = id });
-                if (resUserQualification != 1) throw new Exception("Ошибка создания данных квалификации пользовтеля");
+                var resUserQualification = await _qualificationService.CreateAsync(new QualificationModel { UserId = id });
+                if (resUserQualification != 1) throw new Exception("Ошибка создания данных квалификации пользователя");
+                var resTherapy = await _therapyRepository.CreateAsync(new TherapyModel { UserId = id });
+                if (resUserQualification != 1) throw new Exception("Ошибка создания данных о методах лечения");
 
                 var result = await _userService.UserConfirmAsync(email);
 
@@ -86,6 +92,12 @@ public class UserController : ControllerBase
             }
             catch (Exception ex)
             {
+
+                await _profileService.DeleteAsync(id);
+                await _contactService.DeleteAsync(id);
+                await _qualificationService.DeleteAsync(id);
+                await _therapyRepository.DeleteAsync(id);
+
                 _logger.LogError(ex, "An error occurred while fetching clients.");
                 return StatusCode(500, new ProblemDetails
                 {
@@ -96,10 +108,6 @@ public class UserController : ControllerBase
         }
         else
         {
-            await _profileService.DeleteUserProfileAsync(id);
-            await _contactService.DeleteUserContactsAsync(id);
-            await _qualificationService.DeleteUserQualificationAsync(id);
-
             return BadRequest(new ProblemDetails
             {
                 Title = "BadRequest",

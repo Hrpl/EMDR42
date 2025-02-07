@@ -10,32 +10,8 @@ using System.Threading.Tasks;
 
 namespace EMDR42.Infrastructure.Services.Interfaces;
 
-public interface IContactRepository
+public interface IContactRepository : IAsyncRepository<ContactsDTO, ContactsModel>
 {
-    /// <summary>
-    /// Получение контактов пользователя
-    /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
-    public Task<ContactsDTO> GetUserContactsAsync(int id);
-    /// <summary>
-    /// Создание части профиля с контактами
-    /// </summary>
-    /// <param name="model"></param>
-    /// <returns></returns>
-    public Task<int> CreateUserContactsAsync(ContactsModel model);
-    /// <summary>
-    /// Обновление контактов пользователя
-    /// </summary>
-    /// <param name="model"></param>
-    /// <returns></returns>
-    public Task<int> UpdateUserContactsAsync(ContactsModel model);
-    /// <summary>
-    /// Удаление записи о контактах пользователя
-    /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
-    public Task DeleteUserContactsAsync(int id);
     /// <summary>
     /// Обновление контактного адреса почты
     /// </summary>

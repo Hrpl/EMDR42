@@ -8,7 +8,7 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace EMDR42.API.Controllers;
 
-[Route("api/therapy")]
+[Route("therapy")]
 [ApiController]
 [Authorize]
 public class TherapyController : ControllerBase
@@ -45,7 +45,7 @@ public class TherapyController : ControllerBase
                 });
             }
 
-            var response = await _therapyRepository.GetUserTherapyAsync(id);
+            var response = await _therapyRepository.GetAsync(id);
 
             if (response == null)
             {
@@ -95,7 +95,7 @@ public class TherapyController : ControllerBase
             var model = _mapper.Map<TherapyModel>(request);
             model.UserId = Convert.ToInt32(userId);
 
-            var result = await _therapyRepository.UpdateUserQualificationAsync(model);
+            var result = await _therapyRepository.UpdateAsync(model);
             if (result != 1)
             {
                 _logger.LogError($"Произошла ошибка при обновлении контактов пользователя");

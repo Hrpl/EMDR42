@@ -9,7 +9,7 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace EMDR42.API.Controllers;
 
-[Route("api/user")]
+[Route("user")]
 [ApiController]
 public class AuthController : ControllerBase
 {
