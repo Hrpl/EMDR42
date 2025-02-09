@@ -15,16 +15,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Delete old repository from VPS
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          script: |
-            rm -rf /root/EMDR42
-
-
       # Установка соединения с VPS и деплой
       - name: Deploy application via SSH
         uses: appleboy/ssh-action@master
@@ -34,12 +24,11 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           passphrase: "" # Укажите, если ключ защищён паролем
           script: |
+          
             # Обновление или клонирование репозитория
-            git clone https://github.com/Hrpl/EMDR42.git /root/EMDR42
-            
-
-            # Перемещение в директорию проекта
             cd /root/EMDR42
+            git pull origin main
+            
             docker-compose down
             docker-compose pull
             docker-compose up -d --build
