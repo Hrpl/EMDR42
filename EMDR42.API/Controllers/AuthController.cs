@@ -40,7 +40,6 @@ public class AuthController : ControllerBase
     [SwaggerOperation(Summary = "Авторизация пользователя")]
     public async Task<ActionResult<JwtResponse>> Auth(LoginRequest req)
     {
-        //todo: переделать запрос, слишком много данных
 
         try
         {

@@ -22,8 +22,6 @@ services:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_HTTP_PORTS=5010
       - DB_HOST
       - DB_PORT
       - DB_NAME
@@ -40,9 +38,9 @@ services:
     image: postgres:latest
     container_name: db
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 2208
-      POSTGRES_DB: EMDR
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
     ports:
       - "5432:5432"
     volumes:
