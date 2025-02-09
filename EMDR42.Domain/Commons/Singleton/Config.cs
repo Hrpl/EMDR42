@@ -9,10 +9,6 @@ namespace EMDR42.Domain.Commons.Singleton;
 
 public class Config
 {
-    public Config()
-    {
-        Env.TraversePath().Load(); // Загружаем .env файл
-    }
 
     //Database
     public string DbHost => Environment.GetEnvironmentVariable("DB_HOST");
