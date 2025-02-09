@@ -1,9 +1,11 @@
 using EMDR42.API.Extensions;
+using DotNetEnv;
 using Microsoft.OpenApi.Models;
+
+Env.TraversePath().Load();
 
 var builder = WebApplication.CreateBuilder(args);
 builder.AddDataBase();
-builder.AddOptionsSmtp();
 builder.AddJwt();
 // Add services to the container.
 

@@ -1,4 +1,6 @@
-﻿using EMDR42.Infrastructure.Services.Interfaces;
+﻿using EMDR42.Domain.Commons.Singleton;
+using EMDR42.Infrastructure.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Npgsql;
@@ -9,20 +11,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace EMDR42.Infrastructure.Services.Implementations;
 
 public class DbConnectionManager : IDbConnectionManager
 {
-    private readonly IConfiguration _configuration;
+    private readonly Config _config;
     private readonly ILogger<DbConnectionManager> _logger;
-    private string NpgsqlConnectionString => _configuration["ConnectionString:DefaultConnection"];
 
-    public DbConnectionManager(IConfiguration configuration, ILogger<DbConnectionManager> logger)
+    public DbConnectionManager(Config configuration, ILogger<DbConnectionManager> logger)
     {
-        _configuration = configuration;
+        _config = configuration;
         _logger = logger;
     }
+    private string NpgsqlConnectionString => $"Host={_config.DbHost};Port={_config.DbPort};Database={_config.DbName};Username={_config.DbUser};Password={_config.DbPassword};";
+
 
     public NpgsqlConnection PostgresDbConnection => new(NpgsqlConnectionString);
 

@@ -1,6 +1,6 @@
 ﻿using EMDR42.API.Services.Implementation;
 using EMDR42.API.Services.Interfaces;
-using EMDR42.Domain.Commons.Options;
+using EMDR42.Domain.Commons.Singleton;
 using EMDR42.Infrastructure.Context;
 using EMDR42.Infrastructure.Services.Implementations;
 using EMDR42.Infrastructure.Services.Interfaces;
@@ -59,23 +59,18 @@ public static class AddServiceExtensions
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         .AddJwtBearer(options =>
         {
+            var s = Environment.GetEnvironmentVariable("JWT_KEY");
             options.TokenValidationParameters = new TokenValidationParameters
             {
                 ValidateIssuer = false,
-                ValidIssuer = builder.Configuration["JwtConfigurations:Issuer"],
+                ValidIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER"),
                 ValidateAudience = false,
                 ValidateLifetime = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtConfigurations:Key"])),
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_KEY"))),
                 ValidateIssuerSigningKey = true
             };
         });
         builder.Services.AddAuthorization();
-    }
-
-    public static void AddOptionsSmtp(this WebApplicationBuilder builder)
-    {
-        var services = builder.Services;
-        services.Configure<SmtpClientOptions>(builder.Configuration.GetSection(SmtpClientOptions.Key));
     }
     public static void AddMapster(this IServiceCollection services)
     {
@@ -87,6 +82,7 @@ public static class AddServiceExtensions
     }
     public static void AddRegisterService(this IServiceCollection services)
     {
+        services.AddSingleton<Config>();
         services.AddScoped<IDbConnectionManager, DbConnectionManager>();
         services.AddScoped<IJwtHelper, JwtHelper>();
         services.AddScoped<IUserRepository, UserRepository>();

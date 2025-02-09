@@ -23,7 +23,9 @@ public class TherapyModel
     [SqlKata.Column("problems")]
     public string? Problems { get; set; }
     [SqlKata.Column("created_at")]
-    public DateTime? CreatedAt { get; set; }
+    public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
     [SqlKata.Column("updated_at")]
     public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;
+    [SqlKata.Column("is_deleted")]
+    public bool? IsDeleted { get; set; } = false;
 }
