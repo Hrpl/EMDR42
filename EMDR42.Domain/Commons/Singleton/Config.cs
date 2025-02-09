@@ -11,7 +11,7 @@ public class Config
 {
     public Config()
     {
-        Env.Load(); // Загружаем .env файл
+        Env.TraversePath().Load(); // Загружаем .env файл
     }
 
     //Database
