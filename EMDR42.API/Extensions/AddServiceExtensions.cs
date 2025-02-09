@@ -59,7 +59,6 @@ public static class AddServiceExtensions
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         .AddJwtBearer(options =>
         {
-            var s = Environment.GetEnvironmentVariable("JWT_KEY");
             options.TokenValidationParameters = new TokenValidationParameters
             {
                 ValidateIssuer = false,

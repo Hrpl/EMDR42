@@ -24,6 +24,18 @@ services:
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+    emvironment:
+      - DB_HOST
+      - DB_PORT
+      - DB_NAME
+      - DB_USER
+      - DB_PASSWORD
+      - SMTP_HOST
+      - SMTP_PORT
+      - SMTP_EMAIL
+      - SMTP_PASSWORD
+      - JWT_KEY
+      - JWT_ISSUER
 
   db:
     image: postgres:latest
