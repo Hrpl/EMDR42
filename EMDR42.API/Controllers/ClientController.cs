@@ -242,7 +242,7 @@ public class ClientController : ControllerBase
     /// <param name="clientId"></param>
     /// <returns></returns>
     [HttpDelete("{clientId}")]
-    [SwaggerOperation(Summary = "Удаление данных клиента. Необходим JWT")]
+    [SwaggerOperation(Summary = "Удаление данных клиента. Необходим JWT. Админ-панель")]
     public async Task<ActionResult> Delete(int clientId)
     {
         try
