@@ -1,5 +1,6 @@
 ﻿using EMDR42.Domain.Commons.DTO;
 using EMDR42.Domain.Commons.Request;
+using EMDR42.Domain.Models;
 using EMDR42.Infrastructure.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -79,8 +80,55 @@ public class FeedbackController(ILogger<FeedbackController> logger,
 
     
     [HttpPost("create")]
-    public Task<ActionResult> Post([FromBody] FeedbackDTO request)
+    [SwaggerOperation(Summary = "Создание записи обратной связи.")]
+    public async Task<ActionResult> Post([FromBody] FeedbackDTO request)
     {
+        try
+        {
+            var checkEmail = await _userRepository.CheckedUserByLoginAsync(request.Email);
+
+            if (!checkEmail)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "BadRequest",
+                    Detail = "Пользователя с таким email не существует"
+                });
+            }
+
+            var isAlreadyExists = await _feedbackRepository.IsAlreadyFeedback(request.Email);
+
+            if (!isAlreadyExists)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "BadRequest",
+                    Detail = "Вы уже оставили отзыв"
+                });
+            }
+            var model = _mapper.Map<FeedbackModel>(request);
+            var result = await _feedbackRepository.CreateAsync(model);
+            if (result != 1)
+            {
+                _logger.LogError($"Произошла ошибка при создании отзыва");
+                return NotFound(new ProblemDetails
+                {
+                    Title = "NotFound",
+                    Detail = "Произошла ошибка при создании отзыва"
+                });
+            }
+            return Created();
+        }
+        catch (Exception ex)
+        {
+
+            _logger.LogError(ex, "An error occurred while fetching clients.");
+            return StatusCode(500, new ProblemDetails
+            {
+                Title = "Internal server error",
+                Detail = $"Произошла ошибка при обработке запроса. \n {ex.Message}"
+            });
+        }
     }
 
     
