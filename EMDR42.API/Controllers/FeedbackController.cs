@@ -1,6 +1,7 @@
 ﻿using EMDR42.Domain.Commons.DTO;
 using EMDR42.Domain.Commons.Request;
 using EMDR42.Infrastructure.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Swashbuckle.AspNetCore.Annotations;
@@ -20,7 +21,8 @@ public class FeedbackController(ILogger<FeedbackController> logger,
     private readonly IUserRepository _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
 
     [HttpGet("all")]
-    [SwaggerOperation(Summary = "Админ-панель. Получение обратной связи и отзывов. Необходима авторизация",
+    [Authorize]
+    [SwaggerOperation(Summary = "Админ-панель. Получение обратной связи и отзывов. Необходим JWT",
         Description = "Если request.Feedback = false - получение обратной связи, если request.Feedback = true, получение отзывов \n " +
         "Если request.SortOnDate = 0, сначала новые отзывы, иначе сначала старые отзывы \n " +
         "Если request.SortBy = 0, поиск выполняется по имени, если request.SortBy = 1 - по ключевому слову в отзыве")]
@@ -77,7 +79,7 @@ public class FeedbackController(ILogger<FeedbackController> logger,
 
     
     [HttpPost("create")]
-    public void Post([FromBody] string value)
+    public Task<ActionResult> Post([FromBody] FeedbackDTO request)
     {
     }
 
@@ -85,12 +87,60 @@ public class FeedbackController(ILogger<FeedbackController> logger,
     [HttpPut("{id}")]
     public void Put(int id, [FromBody] string value)
     {
+        
     }
 
     
     [HttpDelete("{id}")]
-    public void Delete(int id)
+    [Authorize]
+    [SwaggerOperation(Summary = "Удаление отзыва/обратной связи. Необходим JWT")]
+    public async Task<ActionResult> Delete(int id)
     {
+        try
+        {
+            var userId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
 
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized(new ProblemDetails
+                {
+                    Title = "Unauthorized",
+                    Detail = "Invalid user ID in token."
+                });
+            }
+
+            var isAdmin = await _userRepository.IsAdmin(Convert.ToInt32(userId));
+
+            if (!isAdmin)
+            {
+                return StatusCode(403, new ProblemDetails
+                {
+                    Title = "Forbidden",
+                    Detail = "Invalid user ."
+                });
+            }
+
+            var result = await _feedbackRepository.DeleteAsync(id);
+            if (result != 1)
+            {
+                _logger.LogError($"Произошла ошибка при удалении пользователя, возможно пользователь не найден: id = {id}");
+                return NotFound(new ProblemDetails
+                {
+                    Title = "NotFound",
+                    Detail = "Произошла ошибка при удалении пользователя, возможно пользователь не найден"
+                });
+            }
+
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while fetching clients.");
+            return StatusCode(500, new ProblemDetails
+            {
+                Title = "Internal server error",
+                Detail = $"Произошла ошибка при обработке запроса. \n {ex.Message}"
+            });
+        }
     }
 }

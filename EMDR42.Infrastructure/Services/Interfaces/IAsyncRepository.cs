@@ -15,5 +15,5 @@ public interface IAsyncRepository<TDTO, DModel> where TDTO : class where DModel 
     public Task<TDTO> GetAsync(int id);
     public Task<int> CreateAsync(DModel model);
     public Task<int> UpdateAsync(DModel model);
-    public Task DeleteAsync(int id);
+    public Task<int> DeleteAsync(int id);
 }

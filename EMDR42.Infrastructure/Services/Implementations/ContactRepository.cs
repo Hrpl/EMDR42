@@ -68,11 +68,11 @@ public class ContactRepository(IDbConnectionManager dbConnectionManager) : ICont
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    public async Task DeleteAsync(int id)
+    public async Task<int> DeleteAsync(int id)
     {
         var query = _query.Query(TableName).Where("user_id", id).AsDelete();
 
-        await _query.ExecuteAsync(query);
+        return await _query.ExecuteAsync(query);
     }
 
     public async Task<int> ChangeEmailAsync(int userId, string newEmail)

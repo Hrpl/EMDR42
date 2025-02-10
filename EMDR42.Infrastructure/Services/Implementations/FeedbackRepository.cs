@@ -45,11 +45,11 @@ public class FeedbackRepository(IDbConnectionManager manager) : IFeedbackReposit
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    public async Task DeleteAsync(int id)
+    public async Task<int> DeleteAsync(int id)
     {
         var query = _query.Query(TableName).Where("id", id).AsDelete();
 
-        await _query.ExecuteAsync(query);
+        return await _query.ExecuteAsync(query);
     }
 
     public Task<FeedbackDTO> GetAsync(int id)
