@@ -131,11 +131,70 @@ public class FeedbackController(ILogger<FeedbackController> logger,
         }
     }
 
-    
-    [HttpPut("{id}")]
-    public void Put(int id, [FromBody] string value)
+    [Authorize]
+    [SwaggerOperation(Summary = "Редактирование отзыва.")]
+    [HttpPut("update")]
+    public async Task<ActionResult> Put([FromBody] UpdateFeedbackRequest request)
     {
-        
+        try
+        {
+            var userId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized(new ProblemDetails
+                {
+                    Title = "Unauthorized",
+                    Detail = "Invalid user ID in token."
+                });
+            }
+
+            var isAdmin = await _userRepository.IsAdmin(Convert.ToInt32(userId));
+
+            if (!isAdmin)
+            {
+                return StatusCode(403, new ProblemDetails
+                {
+                    Title = "Forbidden",
+                    Detail = "Invalid user ."
+                });
+            }
+
+            var resp = await _feedbackRepository.GetAsync(request.FeedbackId);
+            if(resp == null)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "BadRequest",
+                    Detail = "Такого отзыва не существует"
+                });
+            }
+            var model = _mapper.Map<FeedbackModel>(request);
+            model.Feedback = request.Feedback;
+
+            var result = await _feedbackRepository.UpdateAsync(model);
+
+            if (result != 1)
+            {
+                _logger.LogError($"Произошла ошибка при создании отзыва");
+                return NotFound(new ProblemDetails
+                {
+                    Title = "NotFound",
+                    Detail = "Произошла ошибка при создании отзыва"
+                });
+            }
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+
+            _logger.LogError(ex, "An error occurred while fetching clients.");
+            return StatusCode(500, new ProblemDetails
+            {
+                Title = "Internal server error",
+                Detail = $"Произошла ошибка при обработке запроса. \n {ex.Message}"
+            });
+        }
     }
 
     

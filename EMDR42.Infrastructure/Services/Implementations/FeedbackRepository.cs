@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace EMDR42.Infrastructure.Services.Implementations;
 
@@ -52,9 +53,18 @@ public class FeedbackRepository(IDbConnectionManager manager) : IFeedbackReposit
         return await _query.ExecuteAsync(query);
     }
 
-    public Task<FeedbackDTO> GetAsync(int id)
+    public async Task<FeedbackDTO> GetAsync(int id)
     {
-        throw new NotImplementedException();
+        var query = _query.Query(TableName)
+            .LeftJoin("user", "user.email", "feedbacks.email")
+            .LeftJoin("user_profile", "user_profile.user_id", "user.id")
+            .Where("id", id)
+            .Select("feedbacks.name as Name", "feedbacks.feedback as Feedback", "feedbacks.email as Email", "user_profile.photo as Photo");
+
+        var res = await _query.FirstOrDefaultAsync<FeedbackDTO>(query);
+
+        return res;
+
     }
 
     ///<inheritdoc/>
