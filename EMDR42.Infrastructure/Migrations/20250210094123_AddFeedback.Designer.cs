@@ -3,6 +3,7 @@ using System;
 using EMDR42.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EMDR42.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250210094123_AddFeedback")]
+    partial class AddFeedback
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -209,26 +212,6 @@ namespace EMDR42.Infrastructure.Migrations
                     b.ToTable("qualifications", (string)null);
                 });
 
-            modelBuilder.Entity("EMDR42.Domain.Entities.RoleEntity", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("name");
-
-                    b.HasKey("Id")
-                        .HasName("pk_roles");
-
-                    b.ToTable("roles", (string)null);
-                });
-
             modelBuilder.Entity("EMDR42.Domain.Entities.SessionEntity", b =>
                 {
                     b.Property<int>("Id")
@@ -350,10 +333,6 @@ namespace EMDR42.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("password");
-
-                    b.Property<int>("RoleId")
-                        .HasColumnType("integer")
-                        .HasColumnName("role_id");
 
                     b.Property<string>("Salt")
                         .IsRequired()

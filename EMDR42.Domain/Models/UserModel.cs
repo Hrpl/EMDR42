@@ -16,6 +16,8 @@ public class UserModel
     public string Salt { get; set; }
     [SqlKata.Column("is_confirmed")]
     public bool IsConfirmed { get; set; }
+    [SqlKata.Column("role_id")]
+    public int RoleId { get; set; } = 2;
     [SqlKata.Column("created_at")]
     public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
     [SqlKata.Column("updated_at")]

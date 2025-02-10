@@ -17,6 +17,8 @@ public class ApplicationDbContext : DbContext
     public DbSet<SessionEntity> Sessions { get; set; }
     public DbSet<ClientEntity> Clients { get; set; }
     public DbSet<TherapyEntity> Therapies { get; set; }
+    public DbSet<FeedbackEntity> Feedbacks { get; set; }
+    public DbSet<RoleEntity> Roles { get; set; }
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     {
         Database.Migrate();

@@ -121,6 +121,19 @@ public class UserRepository : IUserRepository
         var result = await _query.FirstAsync<int>(query);
         return result;
     }
+    /// <inheritdoc />
+    public async Task<bool> IsAdmin(int userId)
+    {
+        var query = _query.Query(TableName)
+            .Where("id", userId)
+            .Where("role_id", 1)
+            .Select("id");
+
+        var result = await _query.FirstOrDefaultAsync<int?>(query);
+
+        if (result != null) return true;
+        else return false;
+    }
 
     /// <inheritdoc />
     public async Task<bool> LoginUserAsync(LoginRequest request)

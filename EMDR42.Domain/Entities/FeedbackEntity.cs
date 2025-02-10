@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 
 namespace EMDR42.Domain.Entities;
 
-public class UserEntity : BaseEntity
+public class FeedbackEntity : BaseEntity
 {
+    public string Name { get; set; }
     public string Email { get; set; }
-    public string Password { get; set; }
-    public string Salt { get; set; }
-    public bool IsConfirmed { get; set; }
-    public int RoleId { get; set; }
+    public string Feedback {  get; set; }
+    public bool IsApproved { get; set; }
 }

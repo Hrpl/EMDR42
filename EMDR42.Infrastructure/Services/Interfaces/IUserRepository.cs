@@ -67,4 +67,10 @@ public interface IUserRepository
     /// <param name="newEmail"></param>
     /// <returns></returns>
     public Task<int> ChangeEmailAsync(int userId, string newEmail);
+    /// <summary>
+    /// Проверка является ли пользователь администратором
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <returns></returns>
+    public Task<bool> IsAdmin(int userId);
 }
