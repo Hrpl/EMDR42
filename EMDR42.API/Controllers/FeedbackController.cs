@@ -23,7 +23,7 @@ public class FeedbackController(ILogger<FeedbackController> logger,
 
     [HttpGet("all")]
     [Authorize]
-    [SwaggerOperation(Summary = "Админ-панель. Получение обратной связи и отзывов. Необходим JWT",
+    [SwaggerOperation(Summary = "Получение обратной связи и отзывов. Необходим JWT. Админ-панель. ",
         Description = "Если request.Feedback = false - получение обратной связи, если request.Feedback = true, получение отзывов \n " +
         "Если request.SortOnDate = 0, сначала новые отзывы, иначе сначала старые отзывы \n " +
         "Если request.SortBy = 0, поиск выполняется по имени, если request.SortBy = 1 - по ключевому слову в отзыве")]
@@ -132,7 +132,7 @@ public class FeedbackController(ILogger<FeedbackController> logger,
     }
 
     [Authorize]
-    [SwaggerOperation(Summary = "Редактирование отзыва.")]
+    [SwaggerOperation(Summary = "Редактирование отзыва. Админ-панель.")]
     [HttpPut("update")]
     public async Task<ActionResult> Put([FromBody] UpdateFeedbackRequest request)
     {
@@ -200,7 +200,7 @@ public class FeedbackController(ILogger<FeedbackController> logger,
     
     [HttpDelete("{id}")]
     [Authorize]
-    [SwaggerOperation(Summary = "Удаление отзыва/обратной связи. Необходим JWT")]
+    [SwaggerOperation(Summary = "Удаление отзыва/обратной связи. Необходим JWT. Админ-панель")]
     public async Task<ActionResult> Delete(int id)
     {
         try

@@ -85,6 +85,14 @@ public class UserRepository : IUserRepository
     }
 
     /// <inheritdoc />
+    public async Task<int> DeleteUserAsync(int id)
+    {
+        var query = _query.Query(TableName).Where("email", id).AsDelete();
+
+        return await _query.ExecuteAsync(query);
+    }
+
+    /// <inheritdoc />
     public async Task<string?> GetSaltByEmail(string email)
     {
         var query = _query.Query(TableName).Where("email", email).Select("salt");

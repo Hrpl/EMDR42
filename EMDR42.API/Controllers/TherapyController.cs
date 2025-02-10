@@ -77,18 +77,18 @@ public class TherapyController : ControllerBase
     /// <returns></returns>
     [HttpPut("{id}")]
     [SwaggerOperation(Summary = "Обновление данных о лечении и услугах")]
-    public async Task<ActionResult> Put(TherapyDTO request)
+    public async Task<ActionResult> Put([FromBody]TherapyDTO request,[FromRoute] string id)
     {
         try
         {
-            var userId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
+            var userId = id ?? HttpContext.User.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
 
             if (string.IsNullOrEmpty(userId))
             {
                 return Unauthorized(new ProblemDetails
                 {
                     Title = "Unauthorized",
-                    Detail = "Invalid user ID in token."
+                    Detail = "Invalid user ID."
                 });
             }
 

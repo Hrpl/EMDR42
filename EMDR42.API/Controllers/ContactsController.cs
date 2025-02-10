@@ -77,13 +77,13 @@ public class ContactsController : ControllerBase
     /// </summary>
     /// <param name="request"></param>
     /// <returns></returns>
-    [HttpPut]
+    [HttpPut("{id}")]
     [SwaggerOperation(Summary = "Обновление контактов пользователя. Необходим JWT")]
-    public async Task<ActionResult> Put(ContactsDTO request)
+    public async Task<ActionResult> Put([FromBody]ContactsDTO request, [FromRoute] string id)
     {
         try
         {
-            var userId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
+            var userId = id ?? HttpContext.User.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
 
             if (string.IsNullOrEmpty(userId))
             {

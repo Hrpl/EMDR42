@@ -257,7 +257,7 @@ public class ClientController : ControllerBase
                     Detail = "Произошла ошибка при удалении пользователя, возможно пользователь не найден"
                 });
             }
-
+            
             return NoContent();
         }
         catch (Exception ex)

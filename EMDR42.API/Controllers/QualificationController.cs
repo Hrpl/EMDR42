@@ -73,13 +73,13 @@ public class QualificationController : ControllerBase
     /// </summary>
     /// <param name="request"></param>
     /// <returns></returns>
-    [HttpPut]
+    [HttpPut("{id}")]
     [SwaggerOperation(Summary = "Обновление данных о квалификации пользователя. Необходим JWT")]
-    public async Task<ActionResult> Put([FromBody] QualificationDTO request)
+    public async Task<ActionResult> Put([FromBody] QualificationDTO request, [FromRoute] string id)
     {
         try
         {
-            var userId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
+            var userId = id ?? HttpContext.User.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
 
             if (string.IsNullOrEmpty(userId))
             {

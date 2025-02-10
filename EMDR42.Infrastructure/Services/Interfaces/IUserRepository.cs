@@ -44,6 +44,12 @@ public interface IUserRepository
     /// <returns></returns>
     public Task DeleteUserAsync(string login);
     /// <summary>
+    /// Удаление пользователя по id
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    public Task<int> DeleteUserAsync(int id);
+    /// <summary>
     /// Получение id пользователя по его email
     /// </summary>
     /// <param name="login"></param>

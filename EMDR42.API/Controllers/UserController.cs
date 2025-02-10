@@ -4,18 +4,13 @@ using EMDR42.Domain.Commons.Request;
 using EMDR42.Domain.Commons.Templates;
 using EMDR42.Domain.Models;
 using EMDR42.Infrastructure.Services.Interfaces;
-using MapsterMapper;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SqlKata.Compilers;
 using SqlKata.Execution;
 using Swashbuckle.AspNetCore.Annotations;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
 namespace EMDR42.API.Controllers;
 
-//todo: вынести методы по отправке сообщений в другой контроллер
 [Route("user")]
 [ApiController]
 public class UserController : ControllerBase
@@ -49,11 +44,6 @@ public class UserController : ControllerBase
         _therapyRepository = therapyRepository ?? throw new ArgumentNullException(nameof(therapyRepository));
     }
 
-    /// <summary>
-    /// Подтверждение почты пользователя
-    /// </summary>
-    /// <param name="email"></param>
-    /// <returns></returns>
     [HttpGet("confirm")]
     [SwaggerOperation(Summary = "Подтверждение почты пользователя")]
     public async Task<ActionResult> Get([FromQuery] string email)
@@ -116,11 +106,6 @@ public class UserController : ControllerBase
         }
     }
 
-    /// <summary>
-    /// Создание нового пользователя в системе
-    /// </summary>
-    /// <param name="req"></param>
-    /// <returns></returns>
     [HttpPost("create")]
     [SwaggerOperation(Summary = "Создание нового пользователя в системе")]
     public async Task<ActionResult> Create([FromBody] LoginRequest req)
@@ -173,11 +158,6 @@ public class UserController : ControllerBase
         }
     }
 
-    /// <summary>
-    /// Смена пароля пользователя
-    /// </summary>
-    /// <param name="request"></param>
-    /// <returns></returns>
     [HttpPost("change/password")]
     [SwaggerOperation(Summary = "Смена пароля пользователя")]
     public async Task<ActionResult> SendEmailForChangePassword([FromBody] ChangePasswordRequest request)
@@ -220,7 +200,7 @@ public class UserController : ControllerBase
         }
     }
 
-    [HttpGet("cange/email/{email}/{id}")]
+    [HttpGet("change/email/{email}/{id}")]
     [SwaggerOperation(Summary = "Подтверждение почты пользователя")]
     public async Task<ActionResult> ChangeEmails([FromRoute] string email, [FromRoute] int id, [FromQuery] int contact)
     {
@@ -276,5 +256,37 @@ public class UserController : ControllerBase
         }
     }
 
-    
+    [HttpDelete("{id}")]
+    [SwaggerOperation(Summary = "Удаление пользователя. Админ-панель")]
+    public async Task<ActionResult> Delete([FromRoute] int id)
+    {
+        try
+        {
+            var result = await _userService.DeleteUserAsync(id);
+            if (result != 1)
+            {
+                _logger.LogError($"Произошла ошибка при удалении пользователя, возможно пользователь не найден: id = {id}");
+                return NotFound(new ProblemDetails
+                {
+                    Title = "NotFound",
+                    Detail = "Произошла ошибка при удалении пользователя, возможно пользователь не найден"
+                });
+            }
+            await _profileService.DeleteAsync(id);
+            await _contactService.DeleteAsync(id);
+            await _qualificationService.DeleteAsync(id);
+            await _therapyRepository.DeleteAsync(id);
+
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while fetching clients.");
+            return StatusCode(500, new ProblemDetails
+            {
+                Title = "Internal server error",
+                Detail = $"Произошла ошибка при обработке запроса. \n {ex.Message}"
+            });
+        }
+    }
 }
